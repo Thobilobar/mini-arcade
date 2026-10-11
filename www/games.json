@@ -1,0 +1,382 @@
+{
+  "games": [
+    {
+      "id": "tower-defence",
+      "name": {
+        "fa": "دفاع از برج",
+        "en": "Tower Defence",
+        "zh": "塔防",
+        "de": "Turm\u00adverteidigung"
+      },
+      "summary": {
+        "fa": "برج بساز، ارتقا بده، بیست موج را دوام بیاور.",
+        "en": "Build towers, upgrade them, survive twenty waves.",
+        "zh": "建造并升级防御塔，撑过二十波进攻。",
+        "de": "Bau Türme, verbessere sie, überlebe zwanzig Wellen."
+      },
+      "path": "games/tower-defence/index.html",
+      "icon": "games/tower-defence/icon.svg",
+      "color": "#E07A5F",
+      "soft": "#FBE7DF",
+      "added": "2026-09-05",
+      "files": []
+    },
+    {
+      "id": "sudoku",
+      "name": {
+        "fa": "سودوکو",
+        "en": "Sudoku",
+        "zh": "数独",
+        "de": "Sudoku"
+      },
+      "summary": {
+        "fa": "چهار سختی، یادداشت، راهنمایی و چالش روزانه.",
+        "en": "Four difficulties, notes, hints and a daily challenge.",
+        "zh": "四种难度，笔记、提示和每日挑战。",
+        "de": "Vier Schwierigkeitsstufen, Notizen, Tipps und ein Tagesrätsel."
+      },
+      "path": "games/sudoku/index.html",
+      "icon": "games/sudoku/icon.svg",
+      "color": "#6A8CBF",
+      "soft": "#E3EBF7",
+      "added": "2026-09-05",
+      "files": []
+    },
+    {
+      "id": "minesweeper",
+      "name": {
+        "fa": "مین‌روب",
+        "en": "Minesweeper",
+        "zh": "扫雷",
+        "de": "Minesweeper"
+      },
+      "summary": {
+        "fa": "میدان مین را بدون حدس زدن پاک کن.",
+        "en": "Clear the minefield without guessing.",
+        "zh": "不靠猜测扫清雷区。",
+        "de": "Räum das Minenfeld, ohne raten zu müssen."
+      },
+      "path": "games/minesweeper/index.html",
+      "icon": "games/minesweeper/icon.svg",
+      "color": "#E4A853",
+      "soft": "#FBEEDA",
+      "added": "2026-09-05",
+      "files": []
+    },
+    {
+      "id": "dots",
+      "name": {
+        "fa": "نقطه‌بازی",
+        "en": "Dots and Boxes",
+        "zh": "点格棋",
+        "de": "Käsekästchen"
+      },
+      "summary": {
+        "fa": "خط بکش، مربع بگیر. دونفره یا مقابل هوش مصنوعی.",
+        "en": "Draw lines, close boxes. Two players or versus the AI.",
+        "zh": "画线围格子。双人对战或对战电脑。",
+        "de": "Zieh Linien, schließ Kästchen. Zu zweit oder gegen den Computer."
+      },
+      "path": "games/dots/index.html",
+      "icon": "games/dots/icon.svg",
+      "color": "#7BAE7F",
+      "soft": "#E4F0E5",
+      "added": "2026-09-05",
+      "files": []
+    },
+    {
+      "id": "nonogram",
+      "name": {
+        "fa": "نونوگرام",
+        "en": "Nonogram",
+        "zh": "数织",
+        "de": "Nonogramm"
+      },
+      "summary": {
+        "fa": "از روی عددها تصویر پنهان را پیدا کن، بدون حدس.",
+        "en": "Use the numbers to reveal a hidden picture, no guessing.",
+        "zh": "根据数字揭开隐藏的图案，无需猜测。",
+        "de": "Deck mit den Zahlen ein verstecktes Bild auf, ganz ohne Raten."
+      },
+      "path": "games/nonogram/index.html",
+      "icon": "games/nonogram/icon.svg",
+      "color": "#4FA3A5",
+      "soft": "#DDF0F0",
+      "added": "2026-10-02",
+      "files": []
+    },
+    {
+      "id": "mancala",
+      "name": {
+        "fa": "منقله",
+        "en": "Mancala",
+        "zh": "播棋",
+        "de": "Mancala"
+      },
+      "summary": {
+        "fa": "دانه بکار، از حریف بگیر. دونفره یا مقابل هوش مصنوعی.",
+        "en": "Sow seeds, capture your rival's. Two players or versus the AI.",
+        "zh": "播种吃子。双人对战或对战电脑。",
+        "de": "Säe Samen, fang die des Gegners. Zu zweit oder gegen den Computer."
+      },
+      "path": "games/mancala/index.html",
+      "icon": "games/mancala/icon.svg",
+      "color": "#B5838D",
+      "soft": "#F4E6E9",
+      "added": "2026-10-02",
+      "files": []
+    },
+    {
+      "id": "freecell",
+      "name": {
+        "fa": "فری‌سل",
+        "en": "FreeCell",
+        "zh": "空当接龙",
+        "de": "FreeCell"
+      },
+      "summary": {
+        "fa": "بازی ورق تک‌نفره؛ تقریباً هر دستش بردنی است.",
+        "en": "Solitaire where nearly every deal can be won.",
+        "zh": "几乎每一局都能赢的单人纸牌。",
+        "de": "Patience, bei der fast jedes Spiel lösbar ist."
+      },
+      "path": "games/freecell/index.html",
+      "icon": "games/freecell/icon.svg",
+      "color": "#C9545F",
+      "soft": "#F8E2E4",
+      "added": "2026-10-02",
+      "files": []
+    },
+    {
+      "id": "peg",
+      "name": {
+        "fa": "میخ‌پران",
+        "en": "Peg Solitaire",
+        "zh": "孔明棋",
+        "de": "Solitär"
+      },
+      "summary": {
+        "fa": "میخ‌ها را از روی هم بپران تا فقط یکی بماند.",
+        "en": "Jump pegs over each other until only one is left.",
+        "zh": "让棋子互相跳吃，直到只剩一枚。",
+        "de": "Spring mit Stiften übereinander, bis nur noch einer übrig ist."
+      },
+      "path": "games/peg/index.html",
+      "icon": "games/peg/icon.svg",
+      "color": "#9AA84A",
+      "soft": "#EEF1DB",
+      "added": "2026-10-02",
+      "files": []
+    },
+    {
+      "id": "reversi",
+      "name": {
+        "fa": "ریورسی",
+        "en": "Reversi",
+        "zh": "黑白棋",
+        "de": "Reversi"
+      },
+      "summary": {
+        "fa": "مهره‌های حریف را محاصره کن و برگردان. دونفره یا مقابل هوش مصنوعی.",
+        "en": "Outflank and flip your rival's discs. Two players or versus the AI.",
+        "zh": "夹住并翻转对手的棋子。双人对战或对战电脑。",
+        "de": "Schließ die Steine des Gegners ein und dreh sie um. Zu zweit oder gegen den Computer."
+      },
+      "path": "games/reversi/index.html",
+      "icon": "games/reversi/icon.svg",
+      "color": "#2F8F6B",
+      "soft": "#DDEFE7",
+      "added": "2026-10-02",
+      "files": []
+    },
+    {
+      "id": "backgammon",
+      "name": {
+        "fa": "تخته‌نرد",
+        "en": "Backgammon",
+        "zh": "双陆棋",
+        "de": "Backgammon"
+      },
+      "summary": {
+        "fa": "نرد کامل، دونفره یا مقابل هوش مصنوعی.",
+        "en": "Full backgammon, two players or versus the AI.",
+        "zh": "完整双陆棋，双人或对战电脑。",
+        "de": "Echtes Backgammon, zu zweit oder gegen den Computer."
+      },
+      "path": "games/backgammon/index.html",
+      "icon": "games/backgammon/icon.svg",
+      "color": "#A47551",
+      "soft": "#F3E8DE",
+      "added": "2026-10-02",
+      "files": []
+    },
+    {
+      "id": "morris",
+      "name": {
+        "fa": "دوز",
+        "en": "Nine Men's Morris",
+        "zh": "九子棋",
+        "de": "Mühle"
+      },
+      "summary": {
+        "fa": "سه‌تا در یک خط بچین و مهره‌ی حریف را بردار. دونفره یا مقابل هوش مصنوعی.",
+        "en": "Line up three and take a piece. Two players or versus the AI.",
+        "zh": "连成三子吃掉对方一子。双人对战或对战电脑。",
+        "de": "Bilde eine Mühle und nimm einen Stein. Zu zweit oder gegen den Computer."
+      },
+      "path": "games/morris/index.html",
+      "icon": "games/morris/icon.svg",
+      "color": "#8C6BB1",
+      "soft": "#EDE6F4",
+      "added": "2026-10-02",
+      "files": []
+    },
+    {
+      "id": "battleship",
+      "name": {
+        "fa": "نبرد دریایی",
+        "en": "Battleship",
+        "zh": "海战棋",
+        "de": "Schiffe versenken"
+      },
+      "summary": {
+        "fa": "ناوگانت را بچین و پیش از حریف ناوگانش را غرق کن.",
+        "en": "Place your fleet and sink the rival's before it sinks yours.",
+        "zh": "布置舰队，抢先击沉对手的全部战舰。",
+        "de": "Stell deine Flotte auf und versenk die des Gegners zuerst."
+      },
+      "path": "games/battleship/index.html",
+      "icon": "games/battleship/icon.svg",
+      "color": "#3A7AAA",
+      "soft": "#DEE9F3",
+      "added": "2026-10-02",
+      "files": []
+    },
+    {
+      "id": "bridges",
+      "name": {
+        "fa": "پل‌ها",
+        "en": "Bridges",
+        "zh": "数桥",
+        "de": "Brücken"
+      },
+      "summary": {
+        "fa": "جزیره‌ها را با پل به هم وصل کن. هر پازل فقط یک جواب دارد.",
+        "en": "Link the islands with bridges. Every puzzle has one answer.",
+        "zh": "用桥连接岛屿，每道谜题只有一个答案。",
+        "de": "Verbinde die Inseln mit Brücken. Jedes Rätsel hat genau eine Lösung."
+      },
+      "path": "games/bridges/index.html",
+      "icon": "games/bridges/icon.svg",
+      "color": "#D46A9E",
+      "soft": "#F8E3EE",
+      "added": "2026-10-02",
+      "files": []
+    },
+    {
+      "id": "mastermind",
+      "name": {
+        "fa": "رمزشکن",
+        "en": "Code Breaker",
+        "zh": "猜密码",
+        "de": "Codeknacker"
+      },
+      "summary": {
+        "fa": "رمز رنگی را با ده حدس و سرنخ‌هایش پیدا کن.",
+        "en": "Crack a colour code in ten guesses from the clues.",
+        "zh": "根据提示，在十次之内猜出颜色密码。",
+        "de": "Knack einen Farbcode in zehn Versuchen anhand der Hinweise."
+      },
+      "path": "games/mastermind/index.html",
+      "icon": "games/mastermind/icon.svg",
+      "color": "#5E60CE",
+      "soft": "#E5E5F7",
+      "added": "2026-10-02",
+      "files": []
+    },
+    {
+      "id": "breakout",
+      "name": {
+        "fa": "آجرشکن",
+        "en": "Breakout",
+        "zh": "打砖块",
+        "de": "Breakout"
+      },
+      "summary": {
+        "fa": "دوازده دیوار آجری؛ راکت را با یک انگشت بکش.",
+        "en": "Twelve brick walls. Drag the paddle with one finger.",
+        "zh": "十二面砖墙，用一根手指拖动挡板。",
+        "de": "Zwölf Mauern aus Steinen. Zieh den Schläger mit einem Finger."
+      },
+      "path": "games/breakout/index.html",
+      "icon": "games/breakout/icon.svg",
+      "color": "#3FA7D6",
+      "soft": "#DDEFF8",
+      "added": "2026-10-02",
+      "files": []
+    },
+    {
+      "id": "pasur",
+      "name": {
+        "fa": "پاسور",
+        "en": "Pasur",
+        "zh": "帕苏尔",
+        "de": "Pasur"
+      },
+      "summary": {
+        "fa": "بازی ورق ایرانی: جمع یازده، سور بزن، با حریف.",
+        "en": "The Persian fishing card game: make eleven, score a sur, versus the AI.",
+        "zh": "波斯钓鱼纸牌：凑成十一，清台得分，对战电脑。",
+        "de": "Das persische Kartenspiel: Mach elf, räum den Tisch ab, gegen den Computer."
+      },
+      "path": "games/pasur/index.html",
+      "icon": "games/pasur/icon.svg",
+      "color": "#4A7C59",
+      "soft": "#E2EEE5",
+      "added": "2026-10-09",
+      "files": []
+    },
+    {
+      "id": "mahjong",
+      "name": {
+        "fa": "ماهجونگ",
+        "en": "Mahjong Solitaire",
+        "zh": "麻将接龙",
+        "de": "Mahjong"
+      },
+      "summary": {
+        "fa": "کاشی‌های جور و آزاد را جفت کن؛ هر دست حل‌شدنی است.",
+        "en": "Match free pairs of tiles until the board is clear. Every deal can be solved.",
+        "zh": "配对可拿的相同牌，直到清空牌桌。每一局都有解。",
+        "de": "Räum freie Paare gleicher Steine ab. Jedes Spiel ist lösbar."
+      },
+      "path": "games/mahjong/index.html",
+      "icon": "games/mahjong/icon.svg",
+      "color": "#1F8A82",
+      "soft": "#DCF0EE",
+      "added": "2026-10-09",
+      "files": []
+    },
+    {
+      "id": "chess",
+      "name": {
+        "fa": "شطرنج",
+        "en": "Chess",
+        "zh": "国际象棋",
+        "de": "Schach"
+      },
+      "summary": {
+        "fa": "شطرنج با ربات در سه سطح یا دو نفره روی یک گوشی، به‌علاوه‌ی معما.",
+        "en": "Chess against the AI on three levels or two players on one phone, plus puzzles.",
+        "zh": "和三个难度的电脑对弈或两人共用一部手机，还有谜题。",
+        "de": "Schach gegen die KI in drei Stufen oder zu zweit an einem Handy, dazu Rätsel."
+      },
+      "path": "games/chess/index.html",
+      "icon": "games/chess/icon.svg",
+      "color": "#5A6B7B",
+      "soft": "#E3E8ED",
+      "added": "2026-10-09",
+      "files": ["games/chess/puzzles.js"]
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FBF6EF">
+<meta name="description" content="Mini Arcade privacy information for the Telegram Mini App.">
+<title>Privacy — Mini Arcade</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="lib/chogan.css">
+<script src="https://telegram.org/js/telegram-web-app.js?64"></script>
+<script src="lib/tma.js"></script>
+<style>
+  .pv { max-width: 720px; margin: 0 auto; padding: calc(var(--s-5) + var(--safe-t)) calc(var(--s-4) + var(--safe-r)) calc(var(--s-7) + var(--safe-b)) calc(var(--s-4) + var(--safe-l)); }
+  .pv section { margin-bottom: var(--s-6); }
+  .pv h1 { font-size: var(--fs-xl); margin-bottom: var(--s-2); }
+  .pv h2 { font-size: var(--fs-lg); margin: var(--s-5) 0 var(--s-2); }
+  .pv p, .pv li { line-height: 1.8; color: var(--c-text); }
+  .pv ul { padding-inline-start: 1.2em; }
+  .pv .ch-dim { color: var(--c-text-dim); }
+  .pv hr { border: 0; border-top: 1px solid var(--c-line); margin: var(--s-6) 0; }
+  .pv a { color: var(--c-accent); text-underline-offset: 3px; }
+  .pv__home { display: inline-block; margin-bottom: var(--s-4); }
+  .pv code { overflow-wrap: anywhere; }
+</style>
+</head>
+<body>
+<main class="pv">
+  <a class="pv__home" href="./">← Mini Arcade</a>
+
+  <section lang="en" dir="ltr">
+    <h1>Mini Arcade privacy</h1>
+    <p class="ch-dim">Last updated: 10 October 2026</p>
+    <p>Mini Arcade is designed as a local-first Telegram Mini App. This project contains no developer analytics, advertising trackers, or developer-operated application backend.</p>
+
+    <h2>Telegram profile information</h2>
+    <p>When Telegram provides it to the Mini App, the app can read your Telegram display name, username, numeric user ID, language, Premium flag, and profile-photo URL. These fields are used only to personalize the interface and local profile. The app does not treat client-side Telegram profile data as server-verified identity.</p>
+
+    <h2>Game data stored on your device</h2>
+    <ul>
+      <li>Game progress, records, coins, settings, daily-challenge history, and profile preferences are kept in one AES-GCM encrypted local vault.</li>
+      <li>On Telegram clients that support Bot API 9.0 storage, the AES key is kept in Telegram SecureStorage (iOS Keychain / Android Keystore) and the encrypted vault is kept in Telegram DeviceStorage.</li>
+      <li>Outside a supported Telegram client, the fallback uses a non-extractable Web Crypto key in IndexedDB and stores only encrypted vault ciphertext in browser local storage.</li>
+    </ul>
+
+    <h2>Network requests</h2>
+    <p>The app loads Telegram's official Mini App bridge and may load your Telegram profile photo from the URL Telegram provides. Your static hosting provider and Telegram can receive ordinary technical request information such as IP address and user agent under their own policies. Mini Arcade itself does not send game progress or profile data to a developer backend.</p>
+
+    <h2>Deleting local data</h2>
+    <p>Use the full data reset in the Profile screen. It clears the Mini Arcade encrypted vault and its encryption key. Clearing Telegram/browser site data also removes the local copy.</p>
+
+    <h2>Security boundary</h2>
+    <p>The raw Telegram launch data is used only for local presentation in this static app. If a future version adds accounts, leaderboards, purchases, or any trusted server action, the raw Telegram <code>initData</code> must be validated on that server; a bot token must never be embedded in this frontend.</p>
+
+    <h2>Young users</h2>
+    <p>The app does not ask for age and does not transmit game progress to a developer backend. Telegram account and platform privacy practices still apply.</p>
+  </section>
+
+  <hr>
+
+  <section lang="fa" dir="rtl">
+    <h1>حریم خصوصی Mini Arcade</h1>
+    <p class="ch-dim">آخرین به‌روزرسانی: ۱۰ اکتبر ۲۰۲۶</p>
+    <p>Mini Arcade به‌صورت یک مینی‌اپ تلگرام با رویکرد «محلی‌اول» طراحی شده است. در این پروژه تحلیل‌گر توسعه‌دهنده، ردیاب تبلیغاتی یا بک‌اند اختصاصی برنامه وجود ندارد.</p>
+
+    <h2>اطلاعات پروفایل تلگرام</h2>
+    <p>اگر تلگرام در اختیار مینی‌اپ بگذارد، برنامه می‌تواند نام نمایشی، نام کاربری، شناسه عددی کاربر، زبان، وضعیت Premium و نشانی عکس پروفایل را بخواند. این اطلاعات فقط برای شخصی‌سازی رابط و پروفایل محلی استفاده می‌شوند و به‌عنوان هویت تأییدشدهٔ سروری در نظر گرفته نمی‌شوند.</p>
+
+    <h2>داده‌های بازی روی دستگاه</h2>
+    <ul>
+      <li>پیشرفت بازی‌ها، رکوردها، سکه‌ها، تنظیمات، سابقهٔ چالش روزانه و ترجیحات پروفایل در یک مخزن محلی رمزگذاری‌شده با AES-GCM نگهداری می‌شوند.</li>
+      <li>در نسخه‌های پشتیبانی‌شدهٔ تلگرام، کلید رمزگذاری در SecureStorage تلگرام (Keychain در iOS / Keystore در Android) و متن رمز‌شده در DeviceStorage قرار می‌گیرد.</li>
+      <li>خارج از محیط پشتیبانی‌شدهٔ تلگرام، کلید غیرقابل‌استخراج Web Crypto در IndexedDB و فقط متن رمز‌شده در حافظهٔ محلی مرورگر نگهداری می‌شود.</li>
+    </ul>
+
+    <h2>درخواست‌های شبکه</h2>
+    <p>برنامه پل رسمی Mini App تلگرام را بارگذاری می‌کند و ممکن است عکس پروفایل را از نشانی‌ای که تلگرام می‌دهد دریافت کند. سرویس میزبانی و تلگرام می‌توانند طبق سیاست‌های خود اطلاعات فنی عادی درخواست‌ها مانند IP و user-agent را ببینند. خود Mini Arcade پیشرفت بازی یا دادهٔ پروفایل را به بک‌اند توسعه‌دهنده ارسال نمی‌کند.</p>
+
+    <h2>پاک کردن داده‌ها</h2>
+    <p>از گزینهٔ پاک‌سازی کامل در صفحهٔ پروفایل استفاده کن. این کار مخزن رمزگذاری‌شده و کلید رمزگذاری Mini Arcade را حذف می‌کند. پاک کردن دادهٔ سایت/تلگرام نیز نسخهٔ محلی را از بین می‌برد.</p>
+  </section>
+</main>
+</body>
+</html>

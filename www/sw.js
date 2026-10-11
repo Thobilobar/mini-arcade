@@ -1,0 +1,91 @@
+/* Mini Arcade service worker — cache-first shell tied to the app version.
+   importScripts باعث می‌شود مرورگر با تغییر version.js سرویس‌ورکر را دوباره نصب کند. */
+importScripts('./version.js');
+
+// APP_BUILD فقط روی نسخه‌ی گیت‌هاب پیجز هست و ورک‌فلو انتشار آن را می‌گذارد.
+// بدون آن، انتشار وب بین دو نسخه‌ی اندروید اسم کش را عوض نمی‌کرد و کاربرِ
+// برگشته فایل‌های قدیمی را از کش می‌گرفت.
+const CACHE = 'mini-arcade-v' + self.APP_VERSION + (self.APP_BUILD ? '-' + self.APP_BUILD : '');
+
+// پوسته‌ی اپ. فهرست بازی‌ها از games.json موقع نصب خوانده می‌شود
+// تا اضافه کردن بازی جدید هیچ دستکاری‌ای در این فایل نخواهد.
+const SHELL = [
+  './',
+  './index.html',
+  './version.js',
+  './games.json',
+  './manifest.webmanifest',
+  './favicon.svg',
+  './privacy.html',
+  './icon-192.png',
+  './icon-512.png',
+  './icon-maskable-512.png',
+  './lib/chogan.css',
+  './config.js',
+  './lib/tma.js',
+  './lib/chogan.js',
+  './lib/multiplayer.js',
+  './fonts/vazirmatn-variable.woff2'
+];
+
+async function buildList() {
+  const list = SHELL.slice();
+  try {
+    const res = await fetch('./games.json', { cache: 'no-store' });
+    const data = await res.json();
+    (data.games || []).forEach(function (g) {
+      if (g.path) list.push('./' + g.path);
+      if (g.icon) list.push('./' + g.icon);
+      (g.files || []).forEach(function (f) { list.push('./' + f); });
+    });
+  } catch (e) {
+    // اگر فهرست بازی‌ها نیامد، نصب شکست می‌خورد و مرورگر بعداً دوباره تلاش می‌کند.
+    throw e;
+  }
+  return list;
+}
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    buildList()
+      .then((list) => caches.open(CACHE).then((c) => c.addAll(list)))
+  );
+});
+
+// عمداً skipWaiting در نصب نیست: نسخه‌ی تازه منتظر می‌ماند تا صفحه به کاربر
+// خبر بدهد و او خودش بزند. جای‌گزینی بی‌خبر یعنی صفحه زیر دست کاربر ریلود شود.
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'skipWaiting') self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys()
+      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+      .then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener('fetch', (event) => {
+  const req = event.request;
+  if (req.method !== 'GET') return;
+  // ignoreSearch لازم است: منو بازی‌ها را با ?daily=YYYY-MM-DD صدا می‌زند و
+  // بدون این گزینه، درخواستِ چالش روزانه هیچ‌وقت با نسخه‌ی کش‌شده جور نمی‌شد
+  // و آفلاین کاربر را به منو برمی‌گرداند.
+  event.respondWith(
+    caches.match(req, { ignoreSearch: true }).then((hit) => {
+      if (hit) return hit;
+      return fetch(req).then((res) => {
+        if (res && res.ok && res.type === 'basic') {
+          const copy = res.clone();
+          caches.open(CACHE).then((c) => c.put(req, copy));
+        }
+        return res;
+      }).catch(function () {
+        // آفلاین و بیرون از کش: برای ناوبری، منو را بده
+        if (req.mode === 'navigate') return caches.match('./index.html');
+        throw new Error('offline');
+      });
+    })
+  );
+});

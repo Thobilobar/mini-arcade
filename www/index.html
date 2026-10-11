@@ -1,0 +1,953 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#FBF6EF">
+<meta name="description" content="Mini Arcade — a lightweight game collection built for Telegram Mini Apps.">
+<title>Mini Arcade</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="lib/chogan.css">
+</head>
+<body>
+<div id="app"></div>
+<nav class="ch-nav" id="nav" aria-label="ناوبری اصلی"><div class="ch-nav__in" id="navIn"></div></nav>
+
+<script src="https://telegram.org/js/telegram-web-app.js?64"></script>
+<script src="version.js"></script>
+<script src="config.js"></script>
+<script src="lib/tma.js"></script>
+<script src="lib/chogan.js"></script>
+<script src="lib/multiplayer.js"></script>
+<script>
+(async function () {
+  'use strict';
+  var C = window.Chogan;
+  await C.ready;
+  if (C.multiplayer && C.multiplayer.routeIncoming()) return;
+  var el = C.el;
+
+  C.strings({
+    fa: {
+      slogan: 'بازی‌های کوچک، تمام‌شدنی، بدون مزاحمت',
+      allGames: 'بازی‌ها', viewGrid: 'نمایش دو ستونه', privacy: 'حریم خصوصی', privacyNone: 'بدون تحلیل‌گر یا سرور توسعه‌دهنده', viewList: 'نمایش یک ستونه', pickDay: 'یک روز را انتخاب کن',
+      unlockAsk: 'با {n} سکه باز شود؟', mascot: 'شخصیت', palette: 'پالت منو',
+      statsTitle: 'آمار تو', perGame: 'به تفکیک بازی',
+      dangerZone: 'پاک کردن داده', wipeAll: 'پاک کردن همه‌چیز',
+      wipeAllAsk: 'همه‌ی داده‌های اپ، سکه‌ها و پیشرفت همه‌ی بازی‌ها پاک شود؟',
+      installed: 'نصب‌شده روی دستگاه', playedTimes: '{n} بار بازی کردی',
+      noneYet: 'هنوز چیزی نیست', dailyOf: 'چالش‌های {d}',
+      noGames: 'هنوز بازی‌ای اضافه نشده', noGamesSub: 'به‌زودی', loadFailed: 'فهرست بازی‌ها بار نشد',
+      loadFailedSub: 'اتصال را چک کن و صفحه را دوباره باز کن',
+      wave: 'موج', wins: 'برد', solved: 'حل‌شده', cleared: 'پاک‌شده',
+      defaultPalette: 'پیش‌فرض', sea: 'دریا', sunset: 'غروب', forest: 'جنگل',
+      fox: 'روباه', owl: 'جغد', cat: 'گربه', bear: 'خرس',
+      welcomeTitle: 'به Mini Arcade خوش آمدی', welcomeSub: 'چند بازی سبک و تمام‌شدنی، بهینه‌شده برای تلگرام.',
+      youTitle: 'پروفایل تو', youSub: 'اگر از تلگرام باز شده باشد، نام و تصویر پروفایل تو به‌صورت محلی استفاده می‌شود.',
+      yourName: 'اسمت', pickChar: 'یک شخصیت انتخاب کن', charFree: 'بقیه را بعداً با سکه باز می‌کنی.',
+      prefsTitle: 'دلخواه خودت تنظیمش کن', prefsSub: 'هر کدام از این‌ها را بعداً هم می‌توانی از تنظیمات عوض کنی.',
+      showWelcome: 'دیدن دوباره‌ی خوشامدگویی', gamesPlayed: 'بازی‌های امتحان‌شده', telegramProfile: 'پروفایل تلگرام', secureLocal: 'ذخیره‌سازی امن محلی', telegramConnected: 'متصل به تلگرام', storageTelegram: 'AES-GCM · ذخیره‌سازی امن تلگرام', storageBrowser: 'AES-GCM · مخزن رمزگذاری‌شده مرورگر', storageMemory: 'حافظه موقت فقط برای این نشست'
+    },
+    en: {
+      slogan: 'Small games you can actually finish',
+      allGames: 'Games', viewGrid: 'Two-column view', privacy: 'Privacy', privacyNone: 'No analytics or developer server', viewList: 'One-column view', pickDay: 'Pick a day',
+      unlockAsk: 'Unlock for {n} coins?', mascot: 'Character', palette: 'Menu palette',
+      statsTitle: 'Your stats', perGame: 'Per game',
+      dangerZone: 'Erase data', wipeAll: 'Erase everything',
+      wipeAllAsk: 'Erase all app data, coins and progress for every game?',
+      installed: 'Installed on device', playedTimes: 'played {n} times',
+      noneYet: 'Nothing yet', dailyOf: 'Challenges of {d}',
+      noGames: 'No games yet', noGamesSub: 'Coming soon', loadFailed: 'Could not load the game list',
+      loadFailedSub: 'Check your connection and reopen the page',
+      wave: 'Wave', wins: 'Wins', solved: 'Solved', cleared: 'Cleared',
+      defaultPalette: 'Default', sea: 'Sea', sunset: 'Sunset', forest: 'Forest',
+      fox: 'Fox', owl: 'Owl', cat: 'Cat', bear: 'Bear',
+      welcomeTitle: 'Welcome to Mini Arcade', welcomeSub: 'A lightweight collection of finishable games, tuned for Telegram.',
+      youTitle: 'Your profile', youSub: 'When opened in Telegram, your Telegram name and photo are used locally in the app.',
+      yourName: 'Your name', pickChar: 'Pick a character', charFree: 'You can unlock the rest later with coins.',
+      prefsTitle: 'Set it up how you like', prefsSub: 'You can change any of this later in Settings.',
+      showWelcome: 'Show the welcome again', gamesPlayed: 'Games tried', telegramProfile: 'Telegram profile', secureLocal: 'Encrypted local storage', telegramConnected: 'Connected to Telegram', storageTelegram: 'AES-GCM · Telegram secure storage', storageBrowser: 'AES-GCM · encrypted browser vault', storageMemory: 'Temporary session memory only'
+    },
+    zh: {
+      slogan: '小而能玩完的游戏，不打扰你',
+      allGames: '游戏', viewGrid: '双列显示', privacy: '隐私', privacyNone: '无分析服务或开发者服务器', viewList: '单列显示', pickDay: '选择一天',
+      unlockAsk: '花 {n} 金币解锁？', mascot: '角色', palette: '菜单配色',
+      statsTitle: '你的数据', perGame: '按游戏',
+      dangerZone: '清除数据', wipeAll: '清除全部',
+      wipeAllAsk: '清除应用的全部数据、金币和所有游戏进度？',
+      installed: '已安装到设备', playedTimes: '玩过 {n} 次',
+      noneYet: '还没有内容', dailyOf: '{d} 的挑战',
+      noGames: '还没有游戏', noGamesSub: '敬请期待', loadFailed: '游戏列表加载失败',
+      loadFailedSub: '检查网络后重新打开页面',
+      wave: '波次', wins: '胜场', solved: '已解开', cleared: '已扫清',
+      defaultPalette: '默认', sea: '海洋', sunset: '日落', forest: '森林',
+      fox: '狐狸', owl: '猫头鹰', cat: '猫', bear: '熊',
+      welcomeTitle: '欢迎来到 Mini Arcade', welcomeSub: '一组轻量、能玩完并针对 Telegram 优化的小游戏。',
+      youTitle: '你的个人资料', youSub: '从 Telegram 打开时，应用会在本地使用你的 Telegram 名称和头像。',
+      yourName: '你的名字', pickChar: '选一个角色', charFree: '其余的以后可以用金币解锁。',
+      prefsTitle: '按你的喜好设置', prefsSub: '这些以后都可以在设置里修改。',
+      showWelcome: '再看一次欢迎页', gamesPlayed: '玩过的游戏', telegramProfile: 'Telegram 资料', secureLocal: '加密本地存储', telegramConnected: '已连接 Telegram', storageTelegram: 'AES-GCM · Telegram 安全存储', storageBrowser: 'AES-GCM · 浏览器加密保险库', storageMemory: '仅临时会话内存'
+    },
+    de: {
+      slogan: 'Kleine Spiele, die du wirklich zu Ende spielst',
+      allGames: 'Spiele', viewGrid: 'Zwei Spalten', privacy: 'Datenschutz', privacyNone: 'Keine Analyse und kein Entwickler-Server', viewList: 'Eine Spalte', pickDay: 'Tag wählen',
+      unlockAsk: 'Für {n} Münzen freischalten?', mascot: 'Figur', palette: 'Menüfarben',
+      statsTitle: 'Deine Statistik', perGame: 'Pro Spiel',
+      dangerZone: 'Daten löschen', wipeAll: 'Alles löschen',
+      wipeAllAsk: 'Alle App-Daten, Münzen und Spielfortschritte löschen?',
+      installed: 'Auf dem Gerät installiert', playedTimes: '{n}-mal gespielt',
+      noneYet: 'Noch nichts', dailyOf: 'Rätsel vom {d}',
+      noGames: 'Noch keine Spiele', noGamesSub: 'Kommt bald', loadFailed: 'Spieleliste konnte nicht geladen werden',
+      loadFailedSub: 'Prüf deine Verbindung und öffne die Seite neu',
+      wave: 'Welle', wins: 'Siege', solved: 'Gelöst', cleared: 'Geschafft',
+      defaultPalette: 'Standard', sea: 'Meer', sunset: 'Abendrot', forest: 'Wald',
+      fox: 'Fuchs', owl: 'Eule', cat: 'Katze', bear: 'Bär',
+      welcomeTitle: 'Willkommen bei Mini Arcade', welcomeSub: 'Eine leichte Sammlung abschließbarer Spiele, für Telegram optimiert.',
+      youTitle: 'Dein Profil', youSub: 'In Telegram werden dein Telegram-Name und Profilbild lokal in der App verwendet.',
+      yourName: 'Dein Name', pickChar: 'Wähl eine Figur', charFree: 'Den Rest kannst du später mit Münzen freischalten.',
+      prefsTitle: 'Stell es dir ein, wie du magst', prefsSub: 'Das alles kannst du später in den Einstellungen ändern.',
+      showWelcome: 'Begrüßung nochmal zeigen', gamesPlayed: 'Ausprobierte Spiele', telegramProfile: 'Telegram-Profil', secureLocal: 'Verschlüsselter lokaler Speicher', telegramConnected: 'Mit Telegram verbunden', storageTelegram: 'AES-GCM · sicherer Telegram-Speicher', storageBrowser: 'AES-GCM · verschlüsselter Browser-Tresor', storageMemory: 'Nur temporärer Sitzungsspeicher'
+    }
+  });
+
+  var PALETTES = {
+    default: { key: 'defaultPalette', c: '#E07A5F', cost: 0 },
+    sea:     { key: 'sea',            c: '#4E93A8', cost: 150 },
+    sunset:  { key: 'sunset',         c: '#C96A9B', cost: 250 },
+    forest:  { key: 'forest',         c: '#6E9E63', cost: 200 }
+  };
+  var MASCOTS = {
+    fox:  { key: 'fox',  cost: 0 },
+    owl:  { key: 'owl',  cost: 120 },
+    cat:  { key: 'cat',  cost: 200 },
+    bear: { key: 'bear', cost: 320 }
+  };
+
+  var app = document.getElementById('app');
+  var navIn = document.getElementById('navIn');
+  var GAMES = [];
+  // بازی‌هایی که چالش روزانه دارند. شطرنج دونفره روزانه ندارد و "daily": false
+  // در games.json آن را از کارت امروز، فهرست روز و نقطه‌های تقویم بیرون می‌برد (#131)
+  function dailyGames() { return GAMES.filter(function (g) { return g.daily !== false; }); }
+  var gamesLoaded = false;
+  var loadError = false;
+  var tab = 'home';
+
+  /* ------------------------------------------------------------ کمکی */
+
+  function lang() { return C.state.settings.lang; }
+  function gname(g) { return g.name[lang()] || g.name.en || g.name.fa; }
+  function gsum(g) { return g.summary[lang()] || g.summary.en || g.summary.fa; }
+
+  // روشن کردن رنگ بدون color-mix، برای وب‌ویوهای قدیمی
+  function lighten(hex, k) {
+    var h = String(hex).replace('#', '');
+    var n = parseInt(h, 16);
+    var r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+    r = Math.round(r + (255 - r) * k);
+    g = Math.round(g + (255 - g) * k);
+    b = Math.round(b + (255 - b) * k);
+    return 'rgb(' + r + ',' + g + ',' + b + ')';
+  }
+
+  function applyPalette() {
+    var p = PALETTES[C.state.settings.palette || 'default'] || PALETTES.default;
+    document.documentElement.style.setProperty('--c-accent', p.c);
+    // رنگ نرم باید نیمه‌شفاف باشد نه یک رنگ روشن ثابت، وگرنه در تم تاریک
+    // روی زمینه‌ی تیره یک لکه‌ی کرم می‌نشیند. همان کاری که setAccent برای
+    // رنگ تأکید بازی‌ها می‌کند.
+    document.documentElement.style.setProperty('--c-accent-soft', C.alpha(p.c, 0.16));
+  }
+
+  function isNew(g) {
+    if (C.stats.get().byGame[g.id]) return false;
+    var age = (Date.now() - C.keyToDate(g.added).getTime()) / 86400000;
+    return age <= 21;
+  }
+
+  // یک خط خلاصه‌ی وضعیت هر بازی برای کارت منو
+  function bestLine(g) {
+    var s = C.stats.get().byGame[g.id];
+    if (!s || !s.plays) return null;
+    if (g.id === 'tower-defence') {
+      var w = s.best && s.best.wave;
+      return w ? C.t('best') + ' ' + C.t('wave') + ' ' + C.num(w) : null;
+    }
+    if (g.id === 'sudoku') {
+      var t = s.best && s.best['time-medium'];
+      return t ? C.t('best') + ' ' + C.time(t) : C.t('solved') + ' ' + C.num(s.wins);
+    }
+    if (g.id === 'minesweeper') {
+      var t2 = s.best && s.best['time-medium'];
+      return t2 ? C.t('best') + ' ' + C.time(t2) : C.t('cleared') + ' ' + C.num(s.wins);
+    }
+    // بازی‌ای که خط مخصوص ندارد شمار بردهایش را نشان می‌دهد. قبلاً هر شناسه‌ی
+    // دیگر null می‌گرفت و کارت بازی تازه هیچ رکوردی نشان نمی‌داد (#85).
+    return C.t('wins') + ' ' + C.num(s.wins || 0);
+  }
+
+  function goGame(g, daily) {
+    C.markNav();
+    C.feedback('tap');
+    var url = g.path + (daily ? ('?daily=' + daily) : '');
+    setTimeout(function () { location.href = url; }, 90);
+  }
+
+  function coinPill() {
+    return el('div', { class: 'ch-coin' }, [
+      C.icon('coin', 18),
+      el('b', { 'data-coin-view': '1', text: C.num(C.coins.get()) })
+    ]);
+  }
+
+  function profileAvatar(size) {
+    size = size || 44;
+    var url = C.state.profile.photoUrl;
+    var wrap = el('div', { class: 'ch-avatar', style: { width: size + 'px', height: size + 'px', flex: '0 0 ' + size + 'px' } });
+    if (url) {
+      var img = el('img', { src: url, alt: '', width: size, height: size, referrerpolicy: 'no-referrer' });
+      img.addEventListener('error', function () { wrap.innerHTML = C.mascot(C.state.settings.mascot || 'fox', size); });
+      wrap.appendChild(img);
+    } else wrap.innerHTML = C.mascot(C.state.settings.mascot || 'fox', size);
+    return wrap;
+  }
+
+  function storageModeLabel() {
+    var mode = C.telegram && C.telegram.storageMode ? C.telegram.storageMode() : 'browser-encrypted';
+    if (mode.indexOf('telegram-secure') === 0) return C.t('storageTelegram');
+    if (mode === 'memory-only') return C.t('storageMemory');
+    return C.t('storageBrowser');
+  }
+
+  function sectionHead(title, extra) {
+    return el('div', { class: 'ch-section__head' }, [el('h2', { text: title }), extra || null]);
+  }
+
+  /* ------------------------------------------------------------ خانه */
+
+  function viewHome() {
+    var page = el('div', { class: 'ch-page' });
+
+    var m = C.state.settings.mascot || 'fox';
+    var head = el('div', { class: 'ch-head' }, [
+      el('div', { class: 'ch-head__title' }, [
+        el('h1', { text: C.t('appName') }),
+        el('p', { text: C.t('slogan') })
+      ]),
+      coinPill(),
+      el('button', { class: 'ch-avatarbtn', type: 'button', 'aria-label': C.t('profile'), onclick: function () { tab = 'profile'; C.feedback('select'); render(); } }, [profileAvatar(38)])
+    ]);
+    // روی تبلت و دسکتاپ، جایگزین F11. در اپ نصب‌شده ساخته نمی‌شود.
+    var fsBtn = C.fullscreen.button();
+    if (fsBtn) head.appendChild(fsBtn);
+    page.appendChild(head);
+
+    var st = C.stats.get();
+    if (st.streak.count > 0) {
+      var streak = el('div', { class: 'ch-row', style: { 'margin-bottom': 'var(--s-4)' } }, [
+        el('span', { class: 'ch-badge ch-badge--warn' }, [C.icon('flame', 15), el('span', { text: C.num(st.streak.count) + ' ' + C.t('dayStreak') })])
+      ]);
+      page.appendChild(streak);
+    }
+
+    // بدون بازی، صفحه‌ی خانه چیزی برای نشان دادن ندارد.
+    // این حالت واقعاً پیش می‌آید: تا وقتی هیچ بازی‌ای در games.json نیست.
+    if (!GAMES.length) {
+      page.appendChild(el('div', { class: 'ch-empty' }, [
+        el('div', { html: C.mascot(C.state.settings.mascot || 'fox', 92) }),
+        el('h3', { text: loadError ? C.t('loadFailed') : C.t('noGames') }),
+        el('p', { class: 'ch-sm', text: loadError ? C.t('loadFailedSub') : C.t('noGamesSub') })
+      ]));
+      return page;
+    }
+
+    // کارت بزرگ چالش روزانه‌ی امروز
+    var today = C.dateKey();
+    var DG = dailyGames();
+    var idx = Math.abs(C.hash32(today)) % DG.length;
+    var feat = DG[idx];
+    var done = C.stats.dailyDone(feat.id, today);
+    var hero = el('div', {
+      class: 'ch-card ch-tap ch-enter',
+      style: { background: feat.color, 'background-image': 'linear-gradient(135deg, ' + C.alpha(feat.color, 1) + ' 0%, ' + lighten(feat.color, .38) + ' 100%)', color: '#fff', 'margin-bottom': 'var(--s-5)' },
+      onclick: function () { goGame(feat, today); }
+    }, [
+      el('div', { class: 'ch-row' }, [
+        el('div', { class: 'ch-grow' }, [
+          el('div', { class: 'ch-row', style: { gap: '6px' } }, [
+            C.icon('calendar', 18),
+            el('span', { class: 'ch-bold ch-sm', text: C.t('todayChallenge') })
+          ]),
+          el('h2', { style: { 'margin-top': '2px' }, text: gname(feat) }),
+          el('p', { class: 'ch-sm', style: { opacity: '.88' }, text: done ? C.t('dailyDone') : C.t('todayChallengeSub') })
+        ]),
+        el('div', { style: { width: '58px', height: '58px', 'border-radius': 'var(--r-md)', background: 'rgba(255,255,255,.22)', display: 'grid', 'place-items': 'center' } },
+          [done ? C.icon('check', 30) : C.icon('play', 28)])
+      ])
+    ]);
+    page.appendChild(hero);
+
+    // پیش‌فرض کاشی‌های دو ستونه است؛ هجده بازی یک‌ستونه روی گوشی سه صفحه اسکرول بود (#149)
+    var asList = C.state.settings.gameView === 'list';
+    var viewBtn = el('button', { class: 'ch-iconbtn', type: 'button', 'aria-label': C.t(asList ? 'viewGrid' : 'viewList'), title: C.t(asList ? 'viewGrid' : 'viewList'),
+      onclick: function () {
+        C.state.settings.gameView = asList ? 'grid' : 'list';
+        C.store.set('settings', C.state.settings);
+        C.feedback('select');
+        render();
+      } }, [C.icon(asList ? 'grid' : 'list', 20)]);
+    var sec = el('div', { class: 'ch-section' }, [sectionHead(C.t('allGames'), viewBtn)]);
+    var grid = el('div', { class: 'ch-games' + (asList ? '' : ' ch-games--grid') });
+    GAMES.forEach(function (g, i) {
+      var badges = el('div', { class: 'ch-game__meta' });
+      if (C.hasResume(g.id)) badges.appendChild(el('span', { class: 'ch-badge ch-badge--good', text: C.t('continueBadge') }));
+      if (isNew(g)) badges.appendChild(el('span', { class: 'ch-badge ch-badge--accent', text: C.t('newBadge') }));
+      var bl = asList && bestLine(g);
+      if (bl) badges.appendChild(el('span', { class: 'ch-badge', text: bl }));
+
+      var card = el('div', {
+        class: 'ch-card ch-game ch-tap ch-enter',
+        style: { '--game': g.color, '--game-soft': g.soft, 'animation-delay': (60 + i * 55) + 'ms' },
+        onclick: function () { goGame(g); }
+      }, [
+        el('div', { class: 'ch-game__icon' }, [el('img', { src: g.icon, alt: '', width: 62, height: 62 })]),
+        el('div', { class: 'ch-game__body' }, [
+          el('div', { class: 'ch-game__name', text: gname(g) }),
+          asList ? el('div', { class: 'ch-game__sum', text: gsum(g) }) : null,
+          badges
+        ])
+      ]);
+      grid.appendChild(card);
+    });
+    sec.appendChild(grid);
+    page.appendChild(sec);
+
+    page.appendChild(el('div', { class: 'ch-center', style: { opacity: '.5', 'margin-top': 'var(--s-6)' } },
+      [el('div', { html: C.mascot(m, 74) })]));
+    return page;
+  }
+
+  /* --------------------------------------------------------- روزانه */
+
+  function viewDaily() {
+    var page = el('div', { class: 'ch-page' });
+    page.appendChild(el('div', { class: 'ch-head' }, [
+      el('div', { class: 'ch-head__title' }, [
+        el('h1', { text: C.t('daily') }),
+        el('p', { text: C.t('todayChallengeSub') })
+      ]),
+      coinPill()
+    ]));
+
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    var cur = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    var monthLabel = el('h2');
+    var calWrap = el('div', { class: 'ch-card' });
+
+    function monthName(d) {
+      try {
+        // شبکه‌ی تقویم میلادی است چون کلید چالش روزانه میلادی است؛ نام ماه
+        // هم باید میلادی باشد وگرنه «مهر» بالای شبکه‌ی سپتامبر می‌نشست.
+        return d.toLocaleDateString(C.dateLocale(), { month: 'long', year: 'numeric' });
+      } catch (e) { return (d.getMonth() + 1) + '/' + d.getFullYear(); }
+    }
+
+    function drawCal() {
+      monthLabel.textContent = monthName(cur);
+      calWrap.innerHTML = '';
+      var grid = el('div', { class: 'ch-cal' });
+      var dows = ['sat', 'sun', 'mon', 'tue', 'wed', 'thu', 'fri'];
+      dows.forEach(function (d) { grid.appendChild(el('div', { class: 'ch-cal__dow', text: C.t(d) })); });
+
+      var first = new Date(cur.getFullYear(), cur.getMonth(), 1);
+      var lead = (first.getDay() + 1) % 7;       // شنبه ستون اول
+      for (var i = 0; i < lead; i++) grid.appendChild(el('div', { class: 'ch-day ch-day--empty' }));
+
+      var dim = new Date(cur.getFullYear(), cur.getMonth() + 1, 0).getDate();
+      for (var d = 1; d <= dim; d++) {
+        (function (day) {
+          var date = new Date(cur.getFullYear(), cur.getMonth(), day);
+          var key = C.dateKey(date);
+          var future = date.getTime() > today.getTime();
+          var rec = C.stats.dailyOf(key);
+          var n = Object.keys(rec).length;
+          var cls = 'ch-day';
+          if (future) cls += ' ch-day--future';
+          if (key === C.dateKey(today)) cls += ' ch-day--today';
+          var DGs = dailyGames();
+          if (DGs.length && n >= DGs.length) cls += ' ch-day--done';
+          var dots = el('div', { class: 'ch-day__dots' });
+          DGs.forEach(function (g) {
+            dots.appendChild(el('div', { class: 'ch-day__dot' + (rec[g.id] ? ' ch-day__dot--on' : '') }));
+          });
+          var b = el('button', { class: cls, type: 'button', disabled: future }, [
+            el('span', { text: C.num(day) }), dots
+          ]);
+          if (!future) b.addEventListener('click', function () { C.feedback('select'); dayModal(key); });
+          grid.appendChild(b);
+        })(d);
+      }
+      calWrap.appendChild(grid);
+    }
+
+    var nav = el('div', { class: 'ch-row', style: { 'margin-bottom': 'var(--s-3)' } }, [
+      el('button', { class: 'ch-iconbtn', type: 'button', 'aria-label': 'قبلی', onclick: function () {
+        cur = new Date(cur.getFullYear(), cur.getMonth() - 1, 1); C.feedback('select'); drawCal();
+      } }, [C.icon(C.isRtl() ? 'forward' : 'back', 20)]),
+      el('div', { class: 'ch-grow ch-center' }, [monthLabel]),
+      el('button', { class: 'ch-iconbtn', type: 'button', 'aria-label': 'بعدی', onclick: function () {
+        var next = new Date(cur.getFullYear(), cur.getMonth() + 1, 1);
+        if (next.getTime() > today.getTime()) return;
+        cur = next; C.feedback('select'); drawCal();
+      } }, [C.icon(C.isRtl() ? 'back' : 'forward', 20)])
+    ]);
+    page.appendChild(nav);
+    page.appendChild(calWrap);
+    drawCal();
+
+    var st = C.stats.get();
+    page.appendChild(el('div', { class: 'ch-stats', style: { 'margin-top': 'var(--s-5)' } }, [
+      el('div', { class: 'ch-stat' }, [el('b', { text: C.num(C.counter('dailyDone')) }), el('span', { text: C.t('daily') })]),
+      el('div', { class: 'ch-stat' }, [el('b', { text: C.num(st.streak.count) }), el('span', { text: C.t('streak') })]),
+      el('div', { class: 'ch-stat' }, [el('b', { text: C.num(st.streak.best || 0) }), el('span', { text: C.t('best') })])
+    ]));
+    return page;
+  }
+
+  function dayModal(key) {
+    var rec = C.stats.dailyOf(key);
+    var list = el('div', { class: 'ch-list' });
+    dailyGames().forEach(function (g) {
+      var r = rec[g.id];
+      list.appendChild(el('div', { class: 'ch-item' }, [
+        el('div', { style: { width: '34px', height: '34px', 'border-radius': '10px', overflow: 'hidden', flex: '0 0 34px' } },
+          [el('img', { src: g.icon, alt: '', width: 34, height: 34 })]),
+        el('div', { class: 'ch-item__label' }, [
+          el('div', { text: gname(g) }),
+          el('div', { class: 'ch-item__hint', text: r ? (r.label || C.t('dailyDone')) : C.t('dailyOpen') })
+        ]),
+        r ? C.icon('check', 22) : el('button', {
+          class: 'ch-btn ch-btn--soft ch-btn--sm', type: 'button', text: C.t('play'),
+          style: { '--game': g.color, '--game-soft': g.soft },
+          onclick: function () { goGame(g, key); }
+        })
+      ]));
+    });
+    var d = C.keyToDate(key);
+    var label;
+    try { label = d.toLocaleDateString(C.dateLocale(), { day: 'numeric', month: 'long' }); }
+    catch (e) { label = key; }
+    C.ui.modal({
+      title: C.t('dailyOf', { d: label }),
+      body: [list],
+      actions: [{ label: C.t('close'), kind: 'primary' }]
+    });
+  }
+
+  /* ------------------------------------------------- پروفایل و تنظیمات */
+
+  function viewProfile() {
+    var page = el('div', { class: 'ch-page' });
+    var st = C.stats.get();
+
+    page.appendChild(el('div', { class: 'ch-head' }, [
+      el('div', { class: 'ch-head__title' }, [el('h1', { text: C.t('profile') })]),
+      coinPill()
+    ]));
+
+    // شناسنامه
+    var nameInput = el('input', {
+      type: 'text', value: C.state.profile.name, maxlength: '48',
+      placeholder: C.t('name') + ' (' + C.t('optional') + ')',
+      style: { flex: '1', 'min-width': '0', font: 'inherit', padding: '10px 14px', 'border-radius': 'var(--r-md)',
+        border: '1px solid var(--c-line)', background: 'var(--c-surface-2)', color: 'var(--c-text)' }
+    });
+    var countryInput = el('input', {
+      type: 'text', value: C.state.profile.country, maxlength: '2',
+      placeholder: C.t('country') + ' (IR)',
+      style: { width: '86px', font: 'inherit', 'text-align': 'center', padding: '10px', 'border-radius': 'var(--r-md)',
+        border: '1px solid var(--c-line)', background: 'var(--c-surface-2)', color: 'var(--c-text)', 'text-transform': 'uppercase' }
+    });
+    function saveProfile() {
+      C.state.profile.name = nameInput.value.trim().slice(0, 48);
+      C.state.profile.country = countryInput.value.trim().toUpperCase().slice(0, 2);
+      C.store.set('profile', C.state.profile);
+    }
+    nameInput.addEventListener('change', saveProfile);
+    countryInput.addEventListener('change', saveProfile);
+
+    page.appendChild(el('div', { class: 'ch-card', style: { 'margin-bottom': 'var(--s-4)' } }, [
+      el('div', { class: 'ch-row', style: { 'margin-bottom': 'var(--s-3)' } }, [
+        profileAvatar(56),
+        el('div', { class: 'ch-grow' }, [
+          el('div', { class: 'ch-bold', text: C.state.profile.name || C.t('you') }),
+          el('div', { class: 'ch-xs ch-faint', text: C.state.profile.username ? ('@' + C.state.profile.username) : (C.telegram && C.telegram.isTelegram && C.telegram.isTelegram() ? C.t('telegramConnected') : C.state.profile.uid) })
+        ])
+      ]),
+      el('div', { class: 'ch-row' }, [nameInput, countryInput])
+    ]));
+
+    // آمار
+    page.appendChild(el('div', { class: 'ch-section' }, [
+      sectionHead(C.t('statsTitle')),
+      el('div', { class: 'ch-stats' }, [
+        el('div', { class: 'ch-stat' }, [el('b', { text: C.num(st.plays) }), el('span', { text: C.t('totalPlays') })]),
+        el('div', { class: 'ch-stat' }, [el('b', { text: C.duration(st.timeMs) }), el('span', { text: C.t('playTime') })]),
+        el('div', { class: 'ch-stat' }, [el('b', { text: C.num(st.streak.count) }), el('span', { text: C.t('streak') })]),
+        el('div', { class: 'ch-stat' }, [el('b', { text: C.num(Object.keys(st.byGame || {}).length) }), el('span', { text: C.t('gamesPlayed') })])
+      ])
+    ]));
+
+    var per = el('div', { class: 'ch-card' });
+    GAMES.forEach(function (g) {
+      var s = st.byGame[g.id];
+      per.appendChild(el('div', { class: 'ch-item' }, [
+        el('div', { style: { width: '30px', height: '30px', 'border-radius': '9px', overflow: 'hidden', flex: '0 0 30px' } },
+          [el('img', { src: g.icon, alt: '', width: 30, height: 30 })]),
+        el('div', { class: 'ch-item__label' }, [
+          el('div', { text: gname(g) }),
+          el('div', { class: 'ch-item__hint', text: s ? C.t('playedTimes', { n: C.num(s.plays) }) : C.t('noneYet') })
+        ]),
+        el('span', { class: 'ch-badge', text: bestLine(g) || '—' })
+      ]));
+    });
+    page.appendChild(el('div', { class: 'ch-section' }, [sectionHead(C.t('perGame')), per]));
+
+    // فروشگاه تزئینی
+    page.appendChild(el('div', { class: 'ch-section' }, [sectionHead(C.t('unlocks')), unlockShop()]));
+
+    // تنظیمات
+    page.appendChild(el('div', { class: 'ch-section' }, [sectionHead(C.t('settings')), settingsCard()]));
+
+    // پاک کردن داده
+    var danger = el('div', { class: 'ch-card' });
+    GAMES.forEach(function (g) {
+      danger.appendChild(el('div', { class: 'ch-item' }, [
+        el('div', { class: 'ch-item__label', text: gname(g) }),
+        el('button', {
+          class: 'ch-btn ch-btn--danger ch-btn--sm', type: 'button', text: C.t('resetGame'),
+          onclick: function () {
+            C.ui.confirm({
+              title: C.t('resetAsk'), body: gname(g) + ' — ' + C.t('resetWarn'), danger: true,
+              onOk: function () {
+                C.storage(g.id).wipe();
+                var s2 = C.stats.get();
+                delete s2.byGame[g.id];
+                C.store.set('stats', s2);
+                C.ui.toast({ icon: 'check', title: C.t('resetDone') });
+                render();
+              }
+            });
+          }
+        })
+      ]));
+    });
+    danger.appendChild(el('div', { class: 'ch-item' }, [
+      el('div', { class: 'ch-item__label', text: C.t('wipeAll') }),
+      el('button', {
+        class: 'ch-btn ch-btn--danger ch-btn--sm', type: 'button', text: C.t('wipeAll'),
+        onclick: function () {
+          C.ui.confirm({
+            title: C.t('wipeAllAsk'), body: C.t('resetWarn'), danger: true,
+            onOk: function () {
+              GAMES.forEach(function (g) { C.storage(g.id).wipe(); });
+              C.store.wipe();
+              if (C.telegram && C.telegram.reset) C.telegram.reset().then(function () { location.reload(); });
+              else location.reload();
+            }
+          });
+        }
+      })
+    ]));
+    page.appendChild(el('div', { class: 'ch-section' }, [sectionHead(C.t('dangerZone')), danger]));
+
+    // درباره
+    page.appendChild(el('div', { class: 'ch-card ch-card--tint' }, [
+      el('div', { class: 'ch-row', style: { 'margin-bottom': 'var(--s-2)' } }, [
+        C.icon('info', 20), el('b', { text: C.t('about') })
+      ]),
+      el('p', { class: 'ch-sm ch-dim', text: C.t('aboutText') }),
+      el('div', { class: 'ch-item' }, [
+        el('div', { class: 'ch-item__label', text: C.t('version') }),
+        el('span', { class: 'ch-badge', text: C.num(C.version) })
+      ]),
+      el('div', { class: 'ch-item' }, [
+        C.icon('shield', 20),
+        el('div', { class: 'ch-item__label', text: C.t('secureLocal') }),
+        el('span', { class: 'ch-badge ch-badge--good', text: storageModeLabel() })
+      ]),
+      el('div', { class: 'ch-item' }, [
+        el('div', { class: 'ch-item__label', text: C.t('privacy') }),
+        el('a', { href: 'privacy.html', text: C.t('privacyNone') })
+      ]),
+      el('div', { class: 'ch-item' }, [
+        el('div', { class: 'ch-item__label', text: C.t('showWelcome') }),
+        el('button', {
+          class: 'ch-btn ch-btn--soft ch-btn--sm', type: 'button', text: C.t('play'),
+          onclick: function () { C.feedback('tap'); openWelcome(); }
+        })
+      ])
+    ]));
+    return page;
+  }
+
+  function unlockShop() {
+    var card = el('div', { class: 'ch-card' });
+    var row = el('div', { class: 'ch-row ch-wrap', style: { 'margin-bottom': 'var(--s-4)' } });
+    Object.keys(MASCOTS).forEach(function (k) {
+      var m = MASCOTS[k];
+      var owned = m.cost === 0 || C.state.unlocks.indexOf('mascot.' + k) >= 0;
+      var active = (C.state.settings.mascot || 'fox') === k;
+      var b = el('button', {
+        class: 'ch-card ch-card--tint ch-tap', type: 'button',
+        style: { padding: 'var(--s-2)', 'text-align': 'center', width: '84px',
+          'border-color': active ? 'var(--c-accent)' : 'var(--c-line)', 'border-width': '2px' }
+      }, [
+        el('div', { html: C.mascot(k, 52), style: { filter: owned ? 'none' : 'grayscale(1)', opacity: owned ? '1' : '.45' } }),
+        el('div', { class: 'ch-xs ch-bold', text: C.t(m.key) }),
+        owned ? el('div', { class: 'ch-xs ch-faint', text: active ? C.t('apply') : C.t('owned') })
+          : el('div', { class: 'ch-xs', style: { color: 'var(--c-gold)' }, text: C.num(m.cost) })
+      ]);
+      b.addEventListener('click', function () { pickUnlock('mascot', k, m, owned); });
+      row.appendChild(b);
+    });
+    card.appendChild(el('div', { class: 'ch-xs ch-faint', text: C.t('mascot') }));
+    card.appendChild(row);
+
+    var row2 = el('div', { class: 'ch-row ch-wrap' });
+    Object.keys(PALETTES).forEach(function (k) {
+      var p = PALETTES[k];
+      var owned = p.cost === 0 || C.state.unlocks.indexOf('palette.' + k) >= 0;
+      var active = (C.state.settings.palette || 'default') === k;
+      var b = el('button', {
+        class: 'ch-card ch-card--tint ch-tap', type: 'button',
+        style: { padding: 'var(--s-2) var(--s-3)', 'text-align': 'center', width: '84px',
+          'border-color': active ? 'var(--c-accent)' : 'var(--c-line)', 'border-width': '2px' }
+      }, [
+        el('div', { style: { width: '34px', height: '34px', 'border-radius': '50%', margin: '0 auto 4px',
+          background: p.c, opacity: owned ? '1' : '.35' } }),
+        el('div', { class: 'ch-xs ch-bold', text: C.t(p.key) }),
+        owned ? el('div', { class: 'ch-xs ch-faint', text: active ? C.t('apply') : C.t('owned') })
+          : el('div', { class: 'ch-xs', style: { color: 'var(--c-gold)' }, text: C.num(p.cost) })
+      ]);
+      b.addEventListener('click', function () { pickUnlock('palette', k, p, owned); });
+      row2.appendChild(b);
+    });
+    card.appendChild(el('div', { class: 'ch-xs ch-faint', text: C.t('palette') }));
+    card.appendChild(row2);
+    return card;
+  }
+
+  function pickUnlock(kind, key, def, owned) {
+    if (owned) {
+      C.state.settings[kind === 'mascot' ? 'mascot' : 'palette'] = key;
+      C.store.set('settings', C.state.settings);
+      applyPalette();
+      C.feedback('select');
+      render();
+      return;
+    }
+    if (!C.coins.can(def.cost)) {
+      C.ui.toast({ icon: 'coin', title: C.t('notEnoughCoins'), sub: C.t('playToEarn') });
+      C.feedback('bad');
+      return;
+    }
+    C.ui.confirm({
+      title: C.t('unlockAsk', { n: C.num(def.cost) }),
+      okLabel: C.t('unlockCost'),
+      onOk: function () {
+        if (!C.coins.spend(def.cost)) return;
+        // خریده‌شده دیگر هدیه نیست و با انتخاب شخصیت دیگر پس گرفته نمی‌شود
+        if (kind === 'mascot' && C.store.get('mascotGift', null) === key) C.store.remove('mascotGift');
+        if (C.state.unlocks.indexOf(kind + '.' + key) < 0) C.state.unlocks.push(kind + '.' + key);
+        C.store.set('unlocks', C.state.unlocks);
+        C.state.settings[kind === 'mascot' ? 'mascot' : 'palette'] = key;
+        C.store.set('settings', C.state.settings);
+        applyPalette();
+        C.feedback('coin');
+        render();
+      }
+    });
+  }
+
+  function settingsCard() {
+    var card = el('div', { class: 'ch-card' });
+    var s = C.state.settings;
+
+    card.appendChild(el('div', { class: 'ch-item' }, [
+      C.icon('globe', 20),
+      el('div', { class: 'ch-item__label', text: C.t('language') }),
+      C.ui.segmented(C.locales().map(function (L) { return { value: L.code, label: L.label }; }), s.lang, function (v) {
+        C.setLang(v); render();
+      })
+    ]));
+
+    card.appendChild(el('div', { class: 'ch-item' }, [
+      C.icon(s.theme === 'dark' ? 'moon' : 'sun', 20),
+      el('div', { class: 'ch-item__label', text: C.t('theme') }),
+      C.ui.segmented([
+        { value: 'auto', label: C.t('themeAuto') },
+        { value: 'light', label: C.t('themeLight') },
+        { value: 'dark', label: C.t('themeDark') }
+      ], s.theme, function (v) { C.setTheme(v); render(); })
+    ]));
+
+    [
+      { icon: 'sound', label: C.t('sfx'), get: function () { return s.sfx; }, set: function (v) { C.audio.setSfx(v); } },
+      { icon: 'music', label: C.t('music'), get: function () { return s.music; }, set: function (v) { C.audio.setMusic(v); } },
+      { icon: 'vibrate', label: C.t('haptics'), get: function () { return s.haptics; }, set: function (v) { s.haptics = v; C.store.set('settings', s); C.haptic('tap'); } }
+    ].forEach(function (o) {
+      card.appendChild(el('div', { class: 'ch-item' }, [
+        C.icon(o.icon, 20),
+        el('div', { class: 'ch-item__label', text: o.label }),
+        C.ui.switch(o.get(), o.set)
+      ]));
+    });
+    return card;
+  }
+
+  /* ----------------------------------------------------- خوشامدگویی اول */
+  /* گام‌ها عمداً یک آرایه‌اند تا اضافه کردن صفحه‌ی تازه — مثلاً معرفی
+     چالش روزانه — فقط یک ورودی باشد، نه دست بردن در جریان کار. */
+
+  function stepHello() {
+    var box = el('div', { class: 'ch-welcome__in ch-enter' }, [
+      el('div', { class: 'ch-welcome__art' }, [profileAvatar(112)]),
+      el('h1', { text: C.t('welcomeTitle') }),
+      el('p', { class: 'ch-welcome__sub', text: C.t('welcomeSub') })
+    ]);
+    // زبان همین اول، تا بقیه‌ی گام‌ها به زبان خودش باشد
+    box.appendChild(el('div', { class: 'ch-row', style: { 'justify-content': 'center' } }, [
+      C.ui.segmented(C.locales().map(function (L) { return { value: L.code, label: L.label }; }),
+        C.state.settings.lang, function (v) { C.setLang(v); applyPalette(); drawWelcome(); })
+    ]));
+    return box;
+  }
+
+  function stepYou() {
+    var input = el('input', {
+      class: 'ch-field', type: 'text', maxlength: '48',
+      value: C.state.profile.name, placeholder: C.t('yourName'),
+      'aria-label': C.t('yourName')
+    });
+    var save = function () {
+      C.state.profile.name = input.value.trim().slice(0, 48);
+      C.store.set('profile', C.state.profile);
+    };
+    input.addEventListener('input', save);
+    input.addEventListener('change', save);
+
+    var chars = el('div', { class: 'ch-chars' });
+    C.mascotNames.forEach(function (k) {
+      var b = el('button', {
+        class: 'ch-char', type: 'button',
+        'aria-pressed': (C.state.settings.mascot || 'fox') === k ? 'true' : 'false'
+      }, [
+        el('div', { html: C.mascot(k, 56) }),
+        el('span', { text: C.t(MASCOTS[k] ? MASCOTS[k].key : k) })
+      ]);
+      b.addEventListener('click', function () {
+        // فقط یک شخصیت رایگان است. انتخاب تازه، رایگانِ قبلی را پس می‌گیرد،
+        // وگرنه با چند ضربه — چه بار اول چه با باز کردن دوباره‌ی خوشامدگویی —
+        // هر چهار شخصیت مجانی به دست می‌آمد.
+        // شخصیتی که با سکه خریده شده هرگز پس گرفته نمی‌شود.
+        var gifted = C.store.get('mascotGift', null);
+        if (gifted && gifted !== k) {
+          var at = C.state.unlocks.indexOf('mascot.' + gifted);
+          if (at >= 0) { C.state.unlocks.splice(at, 1); C.store.set('unlocks', C.state.unlocks); }
+        }
+        if (MASCOTS[k] && MASCOTS[k].cost > 0 && C.state.unlocks.indexOf('mascot.' + k) < 0) {
+          C.state.unlocks.push('mascot.' + k);
+          C.store.set('unlocks', C.state.unlocks);
+          C.store.set('mascotGift', k);
+        }
+        C.state.settings.mascot = k;
+        C.store.set('settings', C.state.settings);
+        C.feedback('select');
+        drawWelcome();
+      });
+      chars.appendChild(b);
+    });
+
+    return el('div', { class: 'ch-welcome__in ch-enter' }, [
+      el('h1', { text: C.t('youTitle') }),
+      el('p', { class: 'ch-welcome__sub', text: C.t('youSub') }),
+      input,
+      el('div', { class: 'ch-xs ch-faint', style: { 'margin-top': 'var(--s-2)' }, text: C.t('pickChar') }),
+      chars,
+      el('p', { class: 'ch-xs ch-faint ch-center', text: C.t('charFree') })
+    ]);
+  }
+
+  function stepPrefs() {
+    var s = C.state.settings;
+    var list = el('div', { class: 'ch-card' }, [
+      el('div', { class: 'ch-item' }, [
+        C.icon(s.theme === 'dark' ? 'moon' : 'sun', 20),
+        el('div', { class: 'ch-item__label', text: C.t('theme') }),
+        C.ui.segmented([
+          { value: 'auto', label: C.t('themeAuto') },
+          { value: 'light', label: C.t('themeLight') },
+          { value: 'dark', label: C.t('themeDark') }
+        ], s.theme, function (v) { C.setTheme(v); drawWelcome(); })
+      ])
+    ]);
+    [
+      { icon: 'sound', label: C.t('sfx'), get: function () { return s.sfx; }, set: function (v) { C.audio.setSfx(v); } },
+      { icon: 'music', label: C.t('music'), get: function () { return s.music; }, set: function (v) { C.audio.setMusic(v); } },
+      { icon: 'vibrate', label: C.t('haptics'), get: function () { return s.haptics; },
+        set: function (v) { s.haptics = v; C.store.set('settings', s); C.haptic('tap'); } }
+    ].forEach(function (o) {
+      list.appendChild(el('div', { class: 'ch-item' }, [
+        C.icon(o.icon, 20),
+        el('div', { class: 'ch-item__label', text: o.label }),
+        C.ui.switch(o.get(), o.set)
+      ]));
+    });
+
+    return el('div', { class: 'ch-welcome__in ch-enter' }, [
+      el('h1', { text: C.t('prefsTitle') }),
+      el('p', { class: 'ch-welcome__sub', text: C.t('prefsSub') }),
+      list
+    ]);
+  }
+
+  var WELCOME_STEPS = [stepHello, stepYou, stepPrefs];
+  var wStep = 0;
+  var wHost = null;
+
+  function drawWelcome() {
+    if (!wHost) return;
+    wHost.innerHTML = '';
+    wHost.appendChild(WELCOME_STEPS[wStep]());
+
+    var last = wStep === WELCOME_STEPS.length - 1;
+    var dots = el('div', { class: 'ch-tut__dots' });
+    for (var i = 0; i < WELCOME_STEPS.length; i++) {
+      dots.appendChild(el('div', { class: 'ch-tut__dot' + (i === wStep ? ' ch-tut__dot--on' : '') }));
+    }
+    var next = el('button', {
+      class: 'ch-btn ch-btn--primary', type: 'button',
+      text: last ? C.t('start') : C.t('next')
+    });
+    next.addEventListener('click', function () {
+      C.feedback('tap');
+      if (last) { closeWelcome(); return; }
+      wStep++;
+      drawWelcome();
+    });
+    var foot = el('div', { class: 'ch-welcome__foot' }, [
+      wStep > 0 ? el('button', {
+        class: 'ch-btn ch-btn--ghost', type: 'button', text: C.t('back'),
+        onclick: function () { C.feedback('tap'); wStep--; drawWelcome(); }
+      }) : null,
+      next
+    ]);
+    var inner = wHost.querySelector('.ch-welcome__in');
+    inner.appendChild(dots);
+    inner.appendChild(foot);
+  }
+
+  function openWelcome() {
+    if (wHost && wHost.parentNode) wHost.parentNode.removeChild(wHost);
+    wStep = 0;
+    wHost = el('div', { class: 'ch-welcome', role: 'dialog', 'aria-modal': 'true' });
+    document.body.appendChild(wHost);
+    // aria-modal تنها کافی نیست: بدون این، صفحه‌خوان و کلید Tab همچنان به
+    // منو و نوار ناوبری پشت صفحه می‌رسند.
+    app.setAttribute('aria-hidden', 'true');
+    document.getElementById('nav').setAttribute('aria-hidden', 'true');
+    drawWelcome();
+    // بدون این، Tab به منوی پشت صفحه می‌رسید
+    wHost.addEventListener('keydown', function (e) {
+      if (e.key !== 'Tab' || !wHost) return;
+      var f = wHost.querySelectorAll('button, input, [tabindex]:not([tabindex="-1"])');
+      if (!f.length) return;
+      var first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { last.focus(); e.preventDefault(); }
+      else if (!e.shiftKey && document.activeElement === last) { first.focus(); e.preventDefault(); }
+    });
+  }
+
+  function closeWelcome() {
+    C.store.set('welcomeSeen', true);
+    if (wHost && wHost.parentNode) wHost.parentNode.removeChild(wHost);
+    wHost = null;
+    app.removeAttribute('aria-hidden');
+    document.getElementById('nav').removeAttribute('aria-hidden');
+    // اگر فهرست بازی‌ها هنوز نیامده، رسم را به خود fetch بسپار وگرنه یک لحظه
+    // حالت «هنوز بازی‌ای نیست» می‌پرد و بعد جایش را به فهرست می‌دهد.
+    if (gamesLoaded) render();
+    C.afterUnlock(function () { C.audio.music('menu'); });
+  }
+
+  /* ------------------------------------------------------------ ناوبری */
+
+  var TABS = [
+    { id: 'home', icon: 'home', label: 'home', view: viewHome },
+    { id: 'daily', icon: 'calendar', label: 'daily', view: viewDaily },
+    { id: 'profile', icon: 'user', label: 'profile', view: viewProfile }
+  ];
+
+  function drawNav() {
+    navIn.innerHTML = '';
+    TABS.forEach(function (t) {
+      var b = el('button', {
+        class: 'ch-nav__item', type: 'button', role: 'tab',
+        'aria-selected': tab === t.id ? 'true' : 'false'
+      }, [C.icon(t.icon, 24), el('span', { text: C.t(t.label) })]);
+      b.addEventListener('click', function () {
+        if (tab === t.id) { window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+        tab = t.id;
+        C.feedback('select');
+        render();
+      });
+      navIn.appendChild(b);
+    });
+  }
+
+  function render() {
+    var t = TABS.filter(function (x) { return x.id === tab; })[0] || TABS[0];
+    app.innerHTML = '';
+    app.appendChild(t.view());
+    drawNav();
+    C.ui.refreshCoins();
+    window.scrollTo(0, 0);
+  }
+
+  /* --------------------------------------------------------- شروع */
+
+  C.boot({ sw: true });
+  applyPalette();
+  C.onLangChange = function () { applyPalette(); };
+  // برگشت از bfcache: سکه و رکوردی که داخل بازی عوض شده باید دیده شود
+  C.onRestore = function () { applyPalette(); if (gamesLoaded) render(); };
+
+  if (!C.store.get('welcomeSeen', false)) openWelcome();
+
+  fetch('games.json', { cache: 'no-store' })
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      GAMES = d.games || [];
+      gamesLoaded = true;
+      render();
+      C.afterUnlock(function () { C.audio.music('menu'); });
+    })
+    .catch(function (err) {
+      // اگر واقعاً فایل نیامد، این را بگو. خطای رندر را قورت نده.
+      if (window.console && console.error) console.error(err);
+      gamesLoaded = true;
+      loadError = true;
+      // از مسیر عادی رندر کن، وگرنه نوار پایین هیچ‌وقت پر نمی‌شود و کاربر
+      // هیچ راهی به تنظیمات و پروفایل ندارد.
+      try { render(); } catch (e2) {
+        if (window.console && console.error) console.error(e2);
+      }
+    });
+})();
+</script>
+</body>
+</html>
