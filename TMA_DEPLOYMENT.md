@@ -21,7 +21,7 @@ A strict Content Security Policy is recommended, but this codebase currently con
 
 Point the bot's Mini App/menu-button configuration at the deployed HTTPS URL. No bot token belongs in the browser bundle.
 
-The runtime calls Telegram `ready()` and `expand()` during bootstrap, follows Telegram theme and safe-area changes, uses the Telegram BackButton on subpages/game pages, and uses Telegram haptics/fullscreen/share APIs where available.
+The runtime calls Telegram `ready()` and `expand()` during bootstrap, follows Telegram theme and safe-area changes, visually merges Auto theme surfaces with Telegram native header/bottom-bar colors, suppresses duplicate home branding under Telegram chrome, uses the Telegram BackButton on subpages/game pages, and uses Telegram haptics/fullscreen/share APIs where available.
 
 ## 3. Backend-free multiplayer configuration
 
@@ -65,7 +65,7 @@ If all persistent browser storage is unavailable, the app can still run in memor
 
 ## 6. Service worker releases
 
-`www/sw.js` uses the Mini Arcade cache namespace and includes the Telegram bridge/app shell in its cache list. `www/version.js` is the release version source. This package is version `1.1.1`.
+`www/sw.js` uses the Mini Arcade cache namespace and includes the Telegram bridge/app shell in its cache list. `www/version.js` is the release version source. This package is version `1.1.2`.
 
 The included GitHub Pages workflow appends `APP_BUILD=<first 12 chars of the Git commit SHA>` to the **deployed copy** of `version.js`. This changes the cache namespace on every successful deployment without modifying the committed release file, fixing the common case where `config.js` or another shell file changes while the semantic version stays the same.
 
@@ -90,6 +90,7 @@ From the project root, all of these should exit successfully:
 ```bash
 node tools/tma-static-check.js
 node tools/tma-unit-test.js
+node tools/tma-ui-check.js
 node tools/tma-game-smoke.js
 node tools/tma-multiplayer-test.js
 node tools/tma-multiplayer-game-test.js

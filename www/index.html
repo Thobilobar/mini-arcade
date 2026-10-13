@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="stylesheet" href="lib/chogan.css">
 </head>
-<body>
+<body class="ma-menu">
 <div id="app"></div>
 <nav class="ch-nav" id="nav" aria-label="ناوبری اصلی"><div class="ch-nav__in" id="navIn"></div></nav>
 
@@ -231,7 +231,7 @@
     var page = el('div', { class: 'ch-page' });
 
     var m = C.state.settings.mascot || 'fox';
-    var head = el('div', { class: 'ch-head' }, [
+    var head = el('div', { class: 'ch-head ch-head--home' }, [
       el('div', { class: 'ch-head__title' }, [
         el('h1', { text: C.t('appName') }),
         el('p', { text: C.t('slogan') })
@@ -270,7 +270,7 @@
     var feat = DG[idx];
     var done = C.stats.dailyDone(feat.id, today);
     var hero = el('div', {
-      class: 'ch-card ch-tap ch-enter',
+      class: 'ch-card ch-tap ch-enter ch-daily-hero',
       style: { background: feat.color, 'background-image': 'linear-gradient(135deg, ' + C.alpha(feat.color, 1) + ' 0%, ' + lighten(feat.color, .38) + ' 100%)', color: '#fff', 'margin-bottom': 'var(--s-5)' },
       onclick: function () { goGame(feat, today); }
     }, [

@@ -511,11 +511,25 @@
 
   Chogan.applyTheme = function () {
     var t = state.settings.theme;
-    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
-    else document.documentElement.removeAttribute('data-theme');
-    var dark = t === 'dark' || (t === 'auto' && global.matchMedia && global.matchMedia('(prefers-color-scheme: dark)').matches);
+    var root = document.documentElement;
+    var tg = bridge && bridge.telegram ? bridge.telegram : null;
+    var syncTelegram = t === 'auto' && !!tg;
+    if (t === 'light' || t === 'dark') root.setAttribute('data-theme', t);
+    else root.removeAttribute('data-theme');
+    if (root.classList) {
+      if (syncTelegram && root.classList.add) root.classList.add('is-telegram-theme-auto');
+      else if (!syncTelegram && root.classList.remove) root.classList.remove('is-telegram-theme-auto');
+    }
+
+    // In Telegram, "Auto" follows Telegram's live theme rather than the OS.
+    // This avoids the brown/black standalone palette sitting inside a blue or
+    // custom Telegram WebView, while explicit Light/Dark choices remain ours.
+    var tgScheme = syncTelegram ? String(tg.colorScheme || '') : '';
+    var dark = t === 'dark' || (t === 'auto' && (tgScheme ? tgScheme === 'dark' :
+      (global.matchMedia && global.matchMedia('(prefers-color-scheme: dark)').matches)));
     var meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', dark ? '#15120E' : '#FBF6EF');
+    var tgBg = syncTelegram && tg.themeParams ? tg.themeParams.bg_color : '';
+    if (meta) meta.setAttribute('content', tgBg || (dark ? '#15120E' : '#FBF6EF'));
   };
   Chogan.setTheme = function (t) {
     state.settings.theme = t;
@@ -1948,6 +1962,11 @@
     if (o.accent) Chogan.setAccent(o.accent, o.accentSoft);
     document.addEventListener('pointerdown', unlockAudioOnce, { passive: true });
     document.addEventListener('keydown', unlockAudioOnce);
+    if (bridge && bridge.on) {
+      bridge.on('theme', function () {
+        if (state.settings.theme === 'auto') Chogan.applyTheme();
+      });
+    }
     if (global.matchMedia) {
       var mq = global.matchMedia('(prefers-color-scheme: dark)');
       var onch = function () { if (state.settings.theme === 'auto') Chogan.applyTheme(); };

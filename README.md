@@ -33,6 +33,7 @@ www/                     Deploy this directory as the Mini App website
 template/game/            Game page template
 tools/tma-static-check.js Production static contract audit
 tools/tma-unit-test.js    Telegram/storage/crypto integration test
+tools/tma-ui-check.js      Telegram-native theme/chrome/layout integration audit
 tools/tma-game-smoke.js   Deterministic smoke checks for all 18 engines
 tools/tma-multiplayer-test.js       Telegram transport/adversarial checks
 tools/tma-multiplayer-game-test.js  Per-game replay/tamper checks
@@ -63,6 +64,7 @@ From the project root:
 ```bash
 node tools/tma-static-check.js
 node tools/tma-unit-test.js
+node tools/tma-ui-check.js
 node tools/tma-game-smoke.js
 node tools/tma-multiplayer-test.js
 node tools/tma-multiplayer-game-test.js
@@ -70,7 +72,7 @@ node tools/tma-multiplayer-stress.js
 node tools/github-pages-check.js
 ```
 
-The release package was produced with the six TMA/game checks plus the GitHub Pages deployment audit green. See `QA_REPORT.md` for the recorded scope and limitations.
+The release package was produced with the full TMA/game/multiplayer suite, the Telegram-native UI audit, and the GitHub Pages deployment audit green. See `QA_REPORT.md` for the recorded scope and limitations.
 
 ## GitHub Pages deployment
 

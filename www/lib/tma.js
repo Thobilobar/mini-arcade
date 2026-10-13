@@ -305,31 +305,65 @@
     if (!tg) return;
     var p = tg.themeParams || {};
     var r = document.documentElement;
-    if (p.bg_color) r.style.setProperty('--tg-theme-bg', p.bg_color);
-    if (p.secondary_bg_color) r.style.setProperty('--tg-theme-secondary-bg', p.secondary_bg_color);
-    if (p.text_color) r.style.setProperty('--tg-theme-text', p.text_color);
-    if (p.hint_color) r.style.setProperty('--tg-theme-hint', p.hint_color);
-    if (p.button_color) r.style.setProperty('--tg-theme-button', p.button_color);
-    if (p.button_text_color) r.style.setProperty('--tg-theme-button-text', p.button_text_color);
+    var vars = {
+      '--tg-theme-bg': p.bg_color,
+      '--tg-theme-secondary-bg': p.secondary_bg_color,
+      '--tg-theme-section-bg': p.section_bg_color,
+      '--tg-theme-section-separator': p.section_separator_color,
+      '--tg-theme-text': p.text_color,
+      '--tg-theme-hint': p.hint_color,
+      '--tg-theme-subtitle': p.subtitle_text_color,
+      '--tg-theme-accent-text': p.accent_text_color,
+      '--tg-theme-destructive': p.destructive_text_color,
+      '--tg-theme-button': p.button_color,
+      '--tg-theme-button-text': p.button_text_color,
+      '--tg-theme-header-bg': p.header_bg_color,
+      '--tg-theme-bottom-bar': p.bottom_bar_bg_color
+    };
+    Object.keys(vars).forEach(function (name) {
+      if (vars[name]) r.style.setProperty(name, vars[name]);
+      else r.style.removeProperty(name);
+    });
     r.setAttribute('data-tg-theme', tg.colorScheme || 'light');
+
+    // Keep Telegram's native header/footer visually continuous with the app.
+    try {
+      if (tg.setHeaderColor) tg.setHeaderColor(p.header_bg_color || p.bg_color || 'bg_color');
+    } catch (e1) { /* older client */ }
+    try {
+      if (tg.setBackgroundColor) tg.setBackgroundColor(p.bg_color || 'bg_color');
+    } catch (e2) { /* older client */ }
+    try {
+      if (tg.setBottomBarColor) tg.setBottomBarColor(p.bottom_bar_bg_color || p.secondary_bg_color || p.bg_color || 'secondary_bg_color');
+    } catch (e3) { /* older client */ }
     emit('theme', tg.colorScheme || 'light');
+  }
+
+  function applyTelegramFrameState() {
+    if (!tg) return;
+    var r = document.documentElement;
+    if (r.classList) {
+      if (tg.isFullscreen && r.classList.add) r.classList.add('is-tg-fullscreen');
+      else if (!tg.isFullscreen && r.classList.remove) r.classList.remove('is-tg-fullscreen');
+    }
+    if (tg.platform) r.setAttribute('data-tg-platform', String(tg.platform));
   }
   function bindTelegram() {
     if (!tg) return;
     try { tg.ready(); } catch (e) { /* no-op */ }
     try { tg.expand(); } catch (e2) { /* no-op */ }
     try { if (tg.isVersionAtLeast && tg.isVersionAtLeast('7.7') && tg.disableVerticalSwipes) tg.disableVerticalSwipes(); } catch (e3) { /* no-op */ }
-    try { if (tg.setHeaderColor) tg.setHeaderColor('bg_color'); } catch (e4) { /* no-op */ }
-    try { if (tg.setBackgroundColor) tg.setBackgroundColor('bg_color'); } catch (e5) { /* no-op */ }
+    document.documentElement.classList.add('is-telegram-mini-app');
+    applyTelegramFrameState();
     applyTelegramTheme();
     applyViewport();
-    try { tg.onEvent('themeChanged', applyTelegramTheme); } catch (e6) { /* no-op */ }
-    try { tg.onEvent('viewportChanged', applyViewport); } catch (e7) { /* no-op */ }
-    try { tg.onEvent('safeAreaChanged', applyViewport); } catch (e8) { /* no-op */ }
-    try { tg.onEvent('contentSafeAreaChanged', applyViewport); } catch (e9) { /* no-op */ }
-    try { tg.onEvent('activated', function () { emit('resume'); }); } catch (e10) { /* no-op */ }
-    try { tg.onEvent('deactivated', function () { emit('pause'); }); } catch (e11) { /* no-op */ }
-    document.documentElement.classList.add('is-telegram-mini-app');
+    try { tg.onEvent('themeChanged', applyTelegramTheme); } catch (e4) { /* no-op */ }
+    try { tg.onEvent('viewportChanged', applyViewport); } catch (e5) { /* no-op */ }
+    try { tg.onEvent('safeAreaChanged', applyViewport); } catch (e6) { /* no-op */ }
+    try { tg.onEvent('contentSafeAreaChanged', applyViewport); } catch (e7) { /* no-op */ }
+    try { tg.onEvent('fullscreenChanged', function () { applyTelegramFrameState(); applyViewport(); }); } catch (e8) { /* no-op */ }
+    try { tg.onEvent('activated', function () { emit('resume'); }); } catch (e9) { /* no-op */ }
+    try { tg.onEvent('deactivated', function () { emit('pause'); }); } catch (e10) { /* no-op */ }
   }
 
   function setupBackButton() {

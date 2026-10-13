@@ -150,6 +150,32 @@
   --sh-inset: inset 0 1px 0 rgba(255, 255, 255, .05);
 }
 
+/* ------------------------------------------------------ Telegram palette
+   In Auto theme, use Telegram's own live ThemeParams so the web content and
+   native Mini App chrome read as one surface. Explicit Light/Dark overrides
+   intentionally keep the Mini Arcade palette. */
+html.is-telegram-mini-app.is-telegram-theme-auto {
+  color-scheme: light;
+  --c-bg:          var(--tg-theme-bg, #FBF6EF);
+  --c-bg-tint:     var(--tg-theme-secondary-bg, var(--tg-theme-bg, #F4EADD));
+  --c-surface:     var(--tg-theme-section-bg, var(--tg-theme-secondary-bg, var(--tg-theme-bg, #FFFFFF)));
+  --c-surface-2:   var(--tg-theme-secondary-bg, var(--tg-theme-section-bg, var(--tg-theme-bg, #F7F1E8)));
+  --c-surface-3:   var(--tg-theme-bg, var(--tg-theme-secondary-bg, #EFE6D9));
+  --c-line:        var(--tg-theme-section-separator, var(--tg-theme-hint, #E7DACA));
+  --c-text:        var(--tg-theme-text, #2C2620);
+  --c-text-dim:    var(--tg-theme-subtitle, var(--tg-theme-hint, #7C7063));
+  --c-text-faint:  var(--tg-theme-hint, #A99C8C);
+  --c-accent:      var(--tg-theme-button, var(--tg-theme-accent-text, #E07A5F));
+  --c-accent-soft: var(--tg-theme-secondary-bg, var(--tg-theme-section-bg, #FBE7DF));
+  --c-accent-ink:  var(--tg-theme-button-text, #FFFFFF);
+  --c-bad:         var(--tg-theme-destructive, #C8574B);
+  --sh-1: 0 1px 2px rgba(0, 0, 0, .12);
+  --sh-2: 0 3px 12px rgba(0, 0, 0, .14);
+  --sh-3: 0 8px 28px rgba(0, 0, 0, .18);
+}
+html.is-telegram-mini-app.is-telegram-theme-auto[data-tg-theme="dark"] { color-scheme: dark; }
+html.is-telegram-mini-app.is-telegram-theme-auto[data-tg-theme="light"] { color-scheme: light; }
+
 /* ------------------------------------------------------------------ پایه */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
@@ -387,6 +413,48 @@ a  { color: var(--c-accent); text-decoration: none; }
 
 .ch-btn__ripple { position: relative; overflow: hidden; }
 
+/* ------------------------------------------ Telegram menu composition
+   Telegram already supplies the Mini App title and close/menu controls in its
+   native header. Avoid repeating the wordmark unless fullscreen removes that
+   host chrome, and use a denser first screen for compact desktop/mobile views. */
+html.is-telegram-mini-app { --nav-h: 58px; }
+html.is-telegram-mini-app body.ma-menu .ch-page {
+  padding-top: calc(10px + var(--safe-t));
+}
+html.is-telegram-mini-app body.ma-menu .ch-head--home {
+  min-height: 44px;
+  margin-bottom: var(--s-3);
+  gap: 10px;
+}
+html.is-telegram-mini-app:not(.is-tg-fullscreen) body.ma-menu .ch-head--home .ch-head__title {
+  display: none;
+}
+html.is-telegram-mini-app:not(.is-tg-fullscreen) body.ma-menu .ch-head--home .ch-coin {
+  margin-inline-start: auto;
+}
+html.is-telegram-mini-app body.ma-menu .ch-daily-hero {
+  margin-bottom: var(--s-4) !important;
+  padding: 14px 16px;
+  border-radius: 22px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, .16);
+}
+html.is-telegram-mini-app body.ma-menu .ch-daily-hero h2 {
+  font-size: 22px;
+}
+html.is-telegram-mini-app body.ma-menu .ch-section {
+  margin-bottom: var(--s-5);
+}
+html.is-telegram-mini-app body.ma-menu .ch-games--grid .ch-game {
+  aspect-ratio: 1.08 / 1;
+  padding: 12px;
+  box-shadow: var(--sh-1);
+}
+html.is-telegram-mini-app body.ma-menu .ch-games--grid .ch-game__icon {
+  width: 52px;
+  height: 52px;
+  flex-basis: 52px;
+}
+
 /* --------------------------------------------------------- نوار ناوبری */
 .ch-nav {
   position: fixed;
@@ -402,6 +470,10 @@ a  { color: var(--c-accent); text-decoration: none; }
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-top: 1px solid var(--c-line);
+}
+html.is-telegram-mini-app.is-telegram-theme-auto .ch-nav {
+  background: var(--tg-theme-bottom-bar, var(--tg-theme-secondary-bg, var(--c-surface)));
+  border-top-color: var(--tg-theme-section-separator, var(--c-line));
 }
 .ch-nav__in { display: flex; width: 100%; max-width: var(--w-page); }
 .ch-nav__item {

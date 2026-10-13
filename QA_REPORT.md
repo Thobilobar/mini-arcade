@@ -1,7 +1,7 @@
 # Mini Arcade TMA — QA Report
 
-Release: **1.1.1**  
-Prepared: **10 October 2026**
+Release: **1.1.2**  
+Prepared: **11 October 2026**
 
 ## Automated release gates
 
@@ -20,6 +20,15 @@ Coverage includes the 18-game catalogue and assets; Telegram SDK/bridge/core ord
 Result: **17/17 passed**.
 
 Coverage includes Telegram secure/device storage selection, lifecycle, user hydration, safe areas, BackButton behavior, plaintext migration/removal, ciphertext verification, AES-key placement, fresh-context decryption, native haptics/share routing and scoped reset.
+
+
+### Telegram-native UI integration audit — PASS
+
+`node tools/tma-ui-check.js`
+
+Result: **16/16 passed**.
+
+Coverage includes Telegram ThemeParams mapping for section/text/button/separator colors, native bottom-bar synchronization, duplicate home-title suppression while Telegram chrome is visible, fullscreen-aware title restoration, compact TMA spacing, denser game tiles, and Telegram color-scheme tracking for Auto theme.
 
 ### Game-engine migration smoke — PASS
 
@@ -59,7 +68,7 @@ After the multiplayer changes, the original TMA migration gates remain green: **
 
 ## Upstream exhaustive-suite note
 
-The original repository's monolithic suite is not the final TMA release gate because parts intentionally assert the old distribution contract (for example, no external script and the old manifest branding), which conflicts with a Telegram Mini App that loads Telegram's bridge. Its heaviest solver/AI batches also exceed this sandbox's execution window. The focused release gates above keep the original game-engine checks while explicitly testing the new Telegram/crypto/multiplayer contracts.
+The original repository's monolithic suite is not the final TMA release gate because parts intentionally assert the old distribution contract (for example, no external script and the old manifest branding), which conflicts with a Telegram Mini App that loads Telegram's bridge. Its heaviest solver/AI batches also exceed this sandbox's execution window. The focused release gates above keep the original game-engine checks while explicitly testing the new Telegram/crypto/multiplayer/UI contracts.
 
 ## Browser automation limitation
 
@@ -81,4 +90,4 @@ Coverage includes the included GitHub Actions Pages workflow, `.nojekyll`, deplo
 
 A second HTTP smoke mounted the exact `www/` tree at `/repository/` and returned **HTTP 200 with non-empty bodies** for the menu, configuration, version, service worker, manifest, catalogue, Telegram bridge, multiplayer runtime, Chess, Backgammon and privacy page. The workflow YAML also parsed successfully.
 
-With the existing 274 TMA/game/multiplayer assertions, this release records **676 passing automated assertions** before packaging.
+With the existing 274 TMA/game/multiplayer assertions, 16 Telegram-native UI assertions, and 402 GitHub Pages assertions, this release records **692 passing automated assertions** before packaging.
