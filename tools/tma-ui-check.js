@@ -48,6 +48,10 @@ ok(/class="ma-privacy"/.test(privacy) && /pv__hero/.test(privacy) && /pv__card/.
 ok(/is-telegram-mini-app body\.ma-privacy/.test(privacy) && /--tg-theme-section-bg/.test(privacy), 'Privacy surfaces inherit Telegram ThemeParams directly');
 ok(/body\.ma-menu \.ch-layer-panel[\s\S]*background:\s*color-mix/.test(css), 'shared non-game section layer is visually distinct from page background');
 ok(/body\.ma-menu \.ch-soft-row[\s\S]*border-radius:\s*14px/.test(css), 'nested profile/settings rows have clear card affordance');
+ok(/ch-avatar--fallback/.test(index) && /ch-avatar__initial/.test(css), 'profile avatar falls back to an initial/user icon instead of a decorative character');
+ok(!/ch-chars|ch-char\b|pickChar|charFree/.test(index + css), 'onboarding contains no character picker UI');
+ok(/function themeShop\(/.test(index) && !/function unlockShop\(/.test(index), 'Profile customization is reduced to menu themes only');
+ok(/View privacy details/.test(index), 'Profile privacy action is phrased as a clear navigation action');
 
 console.log(`\nTMA UI integration: ${pass}/${pass + fail} passed`);
 if (fail) process.exit(1);

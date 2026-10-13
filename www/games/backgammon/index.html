@@ -38,6 +38,7 @@
 <script src="../../lib/tma.js"></script>
 <script src="../../lib/chogan.js"></script>
 <script src="../../lib/multiplayer.js"></script>
+<script src="../../lib/live-multiplayer.js"></script>
 <script>
 /* ==== ENGINE START ==== */
 function BackgammonEngineFactory() {
@@ -617,8 +618,10 @@ if (typeof module !== 'undefined' && module.exports) module.exports = Backgammon
     base.hist=[];
     return mpSame(mpSnapshotOf(base),env.s);
   }
+  function mpLiveToken(token,env){ return mpOpenIncoming({token:token,env:env||M.decode(token)}); }
   function mpRender(){
     if(!MP||!S||S.mode!=='tg'){M.renderStrip(mpHost,null);return;}
+    if(M.live)M.live.attach(MP,mpLiveToken);
     var mine=!S.winner&&M.isMine(MP,S.turn), pending=MP.tk&&(!mine||S.winner)?MP.tk:'';
     M.renderStrip(mpHost,{match:MP,myTurn:mine,pending:pending,shareText:M.message('Backgammon',MP)});
   }
@@ -640,7 +643,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = Backgammon
     var flat=[]; for(var i=0;i<mpActions.length;i++)flat.push(mpActions[i].from,mpActions[i].to,mpActions[i].die);
     var out=M.advance(MP,mpSnapshot(),S.turn,flat); MP=out.match; mpActions=[]; mpRender();
     // End-turn/last checker are explicit user gestures: immediately open Telegram's chooser; the strip remains as retry.
-    M.share(out.token,M.message('Backgammon',MP));
+    M.deliver(out,M.message('Backgammon',MP));
   }
   function mpOpenIncoming(incoming){
     if(incoming&&incoming.error){M.toastReason(incoming.error);return false;}

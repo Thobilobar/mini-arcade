@@ -46,6 +46,7 @@
 <script src="../../lib/tma.js"></script>
 <script src="../../lib/chogan.js"></script>
 <script src="../../lib/multiplayer.js"></script>
+<script src="../../lib/live-multiplayer.js"></script>
 <script>
 /* ==== ENGINE START ==== */
 function MorrisEngineFactory() {
@@ -578,8 +579,10 @@ if (typeof module !== 'undefined' && module.exports) module.exports = MorrisEngi
     }
     return true;
   }
+  function mpLiveToken(token,env){ return mpOpenIncoming({token:token,env:env||M.decode(token)}); }
   function mpRender() {
     if (!MP || !S || S.mode !== 'tg') { M.renderStrip(mpHost, null); return; }
+    if (M.live) M.live.attach(MP, mpLiveToken);
     var mine = !S.done && M.isMine(MP, S.turn);
     var pending = MP.tk && (!mine || S.done) ? MP.tk : '';
     M.renderStrip(mpHost, { match: MP, myTurn: mine, pending: pending, shareText: M.message("Nine Men's Morris", MP) });
@@ -602,7 +605,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = MorrisEngi
     if (!MP || S.mode !== 'tg') return;
     var out = M.advance(MP, mpSnapshot(), S.turn, [m.from,m.to,m.remove]);
     MP = out.match; mpRender();
-    M.share(out.token, M.message("Nine Men's Morris", MP));
+    M.deliver(out, M.message("Nine Men's Morris", MP));
   }
   function mpOpenIncoming(incoming) {
     if (incoming && incoming.error) { M.toastReason(incoming.error); return false; }

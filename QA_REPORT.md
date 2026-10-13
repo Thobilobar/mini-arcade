@@ -1,93 +1,87 @@
-# Mini Arcade TMA — QA Report
+# Mini Arcade QA Report
 
-Release: **1.1.4**  
-Prepared: **13 October 2026**
+Release: **1.2.0**  
+Date: **13 October 2026**
+
+## Release summary
+
+This release adds low-friction live multiplayer to the six existing two-player games while preserving the previous Telegram deep-link protocol as invitation/recovery fallback.
+
+Normal flow:
+
+1. The inviter makes the first legal action.
+2. Telegram is used once to send the invitation.
+3. The recipient opens the link.
+4. The two Mini Apps negotiate WebRTC through the included signaling Worker.
+5. Subsequent validated moves/turns travel automatically over an encrypted ordered DataChannel.
+6. If the live connection drops, the app reconnects and queues a pending move. If recovery fails, **Send via Telegram** becomes available for the same match.
+
+The signaling Worker accepts WebRTC signaling only. Game `turn` messages are not relayed through it. Room secrets are persisted only as SHA-256 hashes and are assigned an expiry alarm.
 
 ## Automated release gates
 
-### TMA static contract audit — PASS
+| Gate | Result |
+|---|---:|
+| TMA/static contract | **188/188** |
+| Telegram bridge + encrypted storage | **17/17** |
+| Telegram-native UI integration | **39/39** |
+| 18 game-engine smoke tests | **18/18** |
+| Telegram match transport/adversarial | **22/22** |
+| Six per-game multiplayer adapters | **24/24** |
+| Complete/long-match multiplayer stress | **12/12** |
+| Live WebRTC transport/reconnect/ACK | **13/13** |
+| Signaling Worker security/protocol | **11/11** |
+| GitHub Pages/path/deployment audit | **421/421** |
+| **Total** | **765/765** |
 
-`node tools/tma-static-check.js`
+## Live multiplayer assertions covered
 
-Result: **181/181 passed**.
+The dedicated live transport test verifies:
 
-Coverage includes the 18-game catalogue and assets; Telegram SDK/bridge/core ordering; encrypted-vault hydration; root navigation; removal of league/achievement/award and old user-facing attribution; manifest/cache integrity; Telegram profile rendering; SecureStorage/DeviceStorage/AES-GCM/BackButton/haptics/fullscreen contracts; no direct plaintext localStorage in app pages; all inline scripts parsing; all 18 embedded engine factories loading; multiplayer deployment config; root incoming-link routing; service-worker caching of the multiplayer runtime; and Telegram Friend mode being present only on the six intended multiplayer games.
+- cryptographically-sized per-match live room secrets;
+- room secret survival through the compact Telegram invitation format;
+- role-one/role-two binding;
+- connected live state on both peers;
+- automatic opponent move delivery without another Telegram handoff;
+- application-level ACK clearing only after verified receipt;
+- duplicate packet idempotence;
+- wrong-room-secret rejection before game application;
+- queuing during temporary disconnect;
+- one-time Telegram invitation behavior;
+- graceful fallback when no signaling URL is configured.
 
-### Telegram bridge + encrypted storage unit test — PASS
+The signaling Worker test verifies:
 
-`node tools/tma-unit-test.js`
+- room-secret authentication;
+- opposite-role peer joining;
+- SDP offer relay;
+- rejection of gameplay `turn` relay through the signaling service;
+- wrong secret rejection;
+- same-role reconnect replacement;
+- disconnect notification;
+- SHA-256-only secret persistence;
+- automatic room-secret expiry scheduling.
 
-Result: **17/17 passed**.
+## Existing multiplayer regression coverage retained
 
-Coverage includes Telegram secure/device storage selection, lifecycle, user hydration, safe areas, BackButton behavior, plaintext migration/removal, ciphertext verification, AES-key placement, fresh-context decryption, native haptics/share routing and scoped reset.
+The earlier deterministic/replay tests remain green for Chess, Reversi, Mancala, Dots & Boxes, Nine Men's Morris and Backgammon. These cover stale/duplicate updates, previous-state chains, spectator handling, full replay reconstruction, corrupted/tampered state, extra-turn batching, forced passes, complete 8×8 Dots games, randomized Morris games, deterministic Backgammon turns and unusually long Chess histories.
 
+## Deployment checks
 
-### Telegram-native UI integration audit — PASS
+The GitHub Pages audit confirms the app remains safe under a project path such as:
 
-`node tools/tma-ui-check.js`
+```text
+https://username.github.io/repository/
+```
 
-Result: **35/35 passed**.
+The Pages workflow still publishes only the prepared `www/` artifact and now runs the live multiplayer and signaling Worker unit gates before deployment.
 
-Coverage includes Telegram ThemeParams mapping for section/text/button/separator colors, native bottom-bar synchronization, duplicate home-title suppression while Telegram chrome is visible, fullscreen-aware title restoration, compact TMA spacing, denser game tiles, Telegram color-scheme tracking for Auto theme, the layered Games section, elevated/tinted game surfaces, per-game accent treatment, tactile press feedback and icon elevation, plus the shared layered redesign for Daily, Profile/Settings, day-detail modal, first-run onboarding and Privacy.
+The signaling service itself is **not** automatically deployed by the Pages workflow. It is included under `signaling-worker/` and can be deployed manually or with the separate manual GitHub Actions workflow.
 
-### Game-engine migration smoke — PASS
+## Limitations / required real-device validation
 
-`node tools/tma-game-smoke.js`
+Node/VM tests cannot reproduce every Telegram WebView, carrier NAT, firewall, mobile-network switch, or OS suspension condition. A real two-account device test is still required before public launch.
 
-Result: **18/18 passed**. Every engine receives a deterministic functional check rather than only a parse check.
+The environment used to build this release could not complete an online `npm install`/Wrangler dry-run within the execution timeout, so this report does **not** claim a live Cloudflare deployment was performed from this sandbox. The Worker source and protocol were syntax/unit tested locally against mocks, and its current configuration follows the included deployment guide.
 
-### Multiplayer transport/adversarial suite — PASS
-
-`node tools/tma-multiplayer-test.js`
-
-Result: **22/22 passed**.
-
-Coverage includes compact token round-trips, Telegram-safe token characters, corruption rejection, two-player identity binding, reply binding, stale/duplicate rejection, previous-state chain rejection, third-account spectator behavior, side mapping, encrypted active-match resume semantics, deep-link construction, Telegram share-chooser invocation, UTF-8 display-name byte bounding and conservative payload-size cases.
-
-### Per-game multiplayer adapter suite — PASS
-
-`node tools/tma-multiplayer-game-test.js`
-
-Result: **24/24 passed**.
-
-Coverage includes Reversi pass replay and tamper rejection; Mancala extra-turn batching and seed conservation; Dots scoring-chain replay, compact-history integrity and a complete 8×8 reconstruction; Morris replay of board/hand/turn/draw-clock state and action mismatch rejection; Backgammon whole-dice-turn replay, invalid-die rejection and checker conservation; and Chess long-history reconstruction, invalid move-index rejection and resignation validation.
-
-### Multiplayer complete-game / long-game stress — PASS
-
-`node tools/tma-multiplayer-stress.js`
-
-Result: **12/12 passed**.
-
-The stress gate completed full cross-device-style simulations for Reversi, Mancala, an 8×8 Dots board and Backgammon; replayed **750 randomized Morris games** (longest observed: **205 moves**); and drove Chess through an unusually long **478-ply legal game** while validating every checkpoint. With deliberately long Telegram-style identity fields, the largest observed conservative launch payloads were: Reversi **286**, Mancala **256**, Dots **478**, Morris **422**, Backgammon **358**, and Chess **351** characters.
-
-The Dots encoder uses a rank/permutation bitstream rather than repeating edge numbers, and Chess checkpoints replay at the latest pawn move/capture so long matches do not grow the transmitted history without bound.
-
-## Regression status
-
-After the multiplayer changes, the original TMA migration gates remain green: **181/181 static**, **17/17 bridge/storage**, and **18/18 engine smoke**. The multiplayer-specific gates add **22/22 transport**, **24/24 adapter**, and **12/12 stress** checks, for **274 passing release assertions** across the six automated gates.
-
-## Upstream exhaustive-suite note
-
-The original repository's monolithic suite is not the final TMA release gate because parts intentionally assert the old distribution contract (for example, no external script and the old manifest branding), which conflicts with a Telegram Mini App that loads Telegram's bridge. Its heaviest solver/AI batches also exceed this sandbox's execution window. The focused release gates above keep the original game-engine checks while explicitly testing the new Telegram/crypto/multiplayer/UI contracts.
-
-## Browser automation limitation
-
-A deterministic Chromium/Playwright harness with mocked Telegram APIs was attempted again for this release, using the installed system Chromium. This execution environment blocked navigation to the local app with **`ERR_BLOCKED_BY_ADMINISTRATOR`**. Therefore real browser/device smoke testing is **not claimed as completed** here.
-
-Before production launch, deploy `www/` over HTTPS and run the device/two-account matrix in `TMA_DEPLOYMENT.md` inside current Telegram Android and iOS clients. Platform WebView behavior, Telegram-client versions, OS-backed storage and the real share chooser cannot be fully proven by Node/VM tests.
-
-## Legal scan
-
-User-facing author/source references remain removed from the runtime. The MIT copyright/permission notice in `LICENSE` and the Vazirmatn font copyright/OFL notice in `www/fonts/OFL.txt` are intentionally retained as required license material.
-
-## GitHub Pages deployment audit — PASS
-
-`node tools/github-pages-check.js`
-
-Result: **402/402 passed**.
-
-Coverage includes the included GitHub Actions Pages workflow, `.nojekyll`, deployment of only the prepared web artifact, per-deploy Git SHA cache rotation, project-site-safe manifest scope/start URLs, relative service-worker registration, absence of hard-coded `github.io` origins, absence of frontend bot tokens, and resolution of every shipped local HTML `href`/`src` under a simulated `https://example.github.io/mini-arcade/` project path.
-
-A second HTTP smoke mounted the exact `www/` tree at `/repository/` and returned **HTTP 200 with non-empty bodies** for the menu, configuration, version, service worker, manifest, catalogue, Telegram bridge, multiplayer runtime, Chess, Backgammon and privacy page. The workflow YAML also parsed successfully.
-
-With the existing 274 TMA/game/multiplayer assertions, 35 Telegram-native/UI assertions, and 402 GitHub Pages assertions, this release records **711 passing automated assertions** before packaging.
+For production reliability on restrictive networks, configure TURN as described in `LIVE_MULTIPLAYER_SETUP.md` and test on both Wi-Fi and mobile data.

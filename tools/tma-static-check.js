@@ -76,6 +76,8 @@ const index = read(path.join(WWW, 'index.html'));
 const tabs = (index.match(/\{\s*id:\s*'(?:home|daily|profile)'/g) || []).length;
 ok(tabs === 3, 'root navigation exposes exactly Home, Daily, Profile', `found ${tabs}`);
 ok(/profileAvatar\(/.test(index) && /photoUrl/.test(index), 'root UI renders Telegram profile photo when available');
+ok(!/C\.mascot\b|MASCOTS\b|pickChar\b|charFree\b|ch-chars|ch-char\b/.test(index) && !/Chogan\.mascot\b|mascotNames\b|var\s+MASCOT\b/.test(read(path.join(WWW, 'lib', 'chogan.js'))), 'decorative character picker/rendering system is removed');
+ok(/View privacy details/.test(index) && !/No analytics or developer server/.test(index), 'Profile privacy row uses a user-facing details label rather than internal architecture wording');
 
 ok(manifest.name === 'Mini Arcade' && manifest.short_name === 'Mini Arcade', 'manifest is branded Mini Arcade');
 ok(!/چوگان|chogan|open.?source|github/i.test(JSON.stringify(manifest)), 'manifest has no old brand/source claims');
@@ -86,16 +88,23 @@ const sw = read(path.join(WWW, 'sw.js'));
 ok(/mini-arcade-v/i.test(sw), 'service worker uses Mini Arcade cache namespace');
 ok(/lib\/tma\.js/.test(sw), 'service worker precaches the TMA bridge');
 ok(/config\.js/.test(sw) && /lib\/multiplayer\.js/.test(sw), 'service worker precaches Telegram multiplayer runtime');
+ok(/lib\/live-multiplayer\.js/.test(sw), 'service worker precaches live WebRTC multiplayer runtime');
 ok(!/چوگان|choganhq/i.test(sw), 'service worker has no old visible branding');
 
 
 const mpGames = ['chess','reversi','mancala','dots','morris','backgammon'];
 const mpLib = read(path.join(WWW, 'lib', 'multiplayer.js'));
+const liveLib = read(path.join(WWW, 'lib', 'live-multiplayer.js'));
+const liveCfg = read(path.join(WWW, 'config.js'));
 ok(exists('config.js') && /botUsername/.test(read(path.join(WWW,'config.js'))), 'Telegram multiplayer deployment config exists');
 ok(mpGames.every(id => /lib\/multiplayer\.js/.test(read(path.join(WWW,'games',id,'index.html')))), 'all six multiplayer games load the shared Telegram transport');
+ok(mpGames.every(id => /lib\/live-multiplayer\.js/.test(read(path.join(WWW,'games',id,'index.html')))), 'all six multiplayer games load the live WebRTC transport');
 ok(mpGames.every(id => /tgFriend/.test(read(path.join(WWW,'games',id,'index.html')))), 'all six multiplayer games expose Telegram Friend mode');
 ok(/routeIncoming/.test(index) && /lib\/multiplayer\.js/.test(index), 'root routes incoming Telegram match links');
 ok(/AES|checksum|revision|spectator|startapp/i.test(mpLib), 'multiplayer runtime contains integrity, revision and spectator handling');
+ok(/RTCPeerConnection/.test(liveLib) && /WebSocket/.test(liveLib) && /ack/.test(liveLib), 'live runtime contains WebRTC, signaling and application ACK handling');
+ok(/signalingUrl/.test(liveCfg), 'frontend exposes live signaling deployment configuration');
+ok(fs.existsSync(path.join(ROOT,'signaling-worker','src','index.js')) && fs.existsSync(path.join(ROOT,'signaling-worker','wrangler.jsonc')), 'signaling Worker deployment is included');
 
 const privacy = read(path.join(WWW, 'privacy.html'));
 ok(/AES-GCM/i.test(privacy) && /DeviceStorage/.test(privacy) && /SecureStorage/.test(privacy), 'privacy page documents the encrypted Telegram vault');

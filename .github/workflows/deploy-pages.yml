@@ -37,6 +37,8 @@ jobs:
           node tools/tma-multiplayer-test.js
           node tools/tma-multiplayer-game-test.js
           node tools/tma-multiplayer-stress.js
+          node tools/tma-live-multiplayer-test.js
+          node tools/tma-signaling-worker-test.js
           node tools/github-pages-check.js
 
       - name: Prepare immutable Pages artifact

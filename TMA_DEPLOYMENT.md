@@ -23,7 +23,14 @@ Point the bot's Mini App/menu-button configuration at the deployed HTTPS URL. No
 
 The runtime calls Telegram `ready()` and `expand()` during bootstrap, follows Telegram theme and safe-area changes, visually merges Auto theme surfaces with Telegram native header/bottom-bar colors, suppresses duplicate home branding under Telegram chrome, uses the Telegram BackButton on subpages/game pages, and uses Telegram haptics/fullscreen/share APIs where available.
 
-## 3. Backend-free multiplayer configuration
+## 3. Live friend multiplayer configuration
+
+Mini Arcade v1.2.0 uses two transports together:
+
+1. **Telegram deep link** for the first invitation and as a recovery fallback.
+2. **WebRTC DataChannel** for automatic live turns after both Mini Apps are open.
+
+A small Cloudflare Worker/Durable Object is included in `signaling-worker/`. It relays only WebRTC offer/answer/ICE messages; it rejects gameplay `turn` messages. The room secret is stored only as a SHA-256 hash and expires automatically.
 
 Set `www/config.js` before publishing:
 
@@ -31,15 +38,26 @@ Set `www/config.js` before publishing:
 window.MINI_ARCADE_CONFIG = Object.assign({
   botUsername: 'YourBotUsername',
   appShortName: '',
-  deepLinkMode: 'fullscreen'
+  deepLinkMode: 'fullscreen',
+  liveMultiplayer: {
+    enabled: true,
+    signalingUrl: 'https://YOUR-WORKER.workers.dev',
+    connectTimeoutMs: 12000,
+    fallbackDelayMs: 8000,
+    ackTimeoutMs: 4500,
+    reconnectMs: 1200,
+    iceServers: []
+  }
 }, window.MINI_ARCADE_CONFIG || {});
 ```
 
-`botUsername` is required for challenge/move links. Use the username without `@`. Keep `appShortName` empty for a Main Mini App; set it only when the deployed URL is registered as a named Direct Mini App.
+`botUsername` is required for the invitation/fallback links. `signalingUrl` is the HTTPS base URL printed after deploying `signaling-worker/`. If it is blank, multiplayer still works using the earlier Telegram-turn flow.
 
-The multiplayer transport uses Telegram `startapp` links and Telegram's share chooser. It does **not** include a bot token and does not require a backend. Direct-link Mini Apps cannot silently read the chat or silently send arbitrary chat messages, so each completed turn still requires the player to choose/send the Telegram destination. The app minimizes this friction by opening the chooser automatically exactly when control passes to the opponent.
+The live transport automatically reconnects after temporary network/WebView suspension. A sent move is kept pending until the receiving client validates it and returns an application-level ACK. If live reconnection does not recover in time, **Send via Telegram** becomes available so the match is not stranded.
 
-Run real two-account tests for all six supported games before launch: Chess, Reversi, Mancala, Dots & Boxes, Nine Men's Morris and Backgammon. Test challenge creation, recipient binding, reply, dismissed-share retry, duplicate-link reopening, forwarded-link spectator mode, app close/reopen, and final-game result handling.
+See `LIVE_MULTIPLAYER_SETUP.md` for the Cloudflare deployment and two-account test procedure.
+
+Optional TURN can be configured by storing `TURN_KEY_ID` and `TURN_KEY_API_TOKEN` as Worker secrets. Those secrets must never be copied into the frontend.
 
 ## 4. Identity boundary
 
@@ -65,7 +83,7 @@ If all persistent browser storage is unavailable, the app can still run in memor
 
 ## 6. Service worker releases
 
-`www/sw.js` uses the Mini Arcade cache namespace and includes the Telegram bridge/app shell in its cache list. `www/version.js` is the release version source. This package is version `1.1.4`.
+`www/sw.js` uses the Mini Arcade cache namespace and includes the Telegram bridge/app shell in its cache list. `www/version.js` is the release version source. This package is version `1.2.0`.
 
 The included GitHub Pages workflow appends `APP_BUILD=<first 12 chars of the Git commit SHA>` to the **deployed copy** of `version.js`. This changes the cache namespace on every successful deployment without modifying the committed release file, fixing the common case where `config.js` or another shell file changes while the semantic version stays the same.
 
@@ -95,6 +113,8 @@ node tools/tma-game-smoke.js
 node tools/tma-multiplayer-test.js
 node tools/tma-multiplayer-game-test.js
 node tools/tma-multiplayer-stress.js
+node tools/tma-live-multiplayer-test.js
+node tools/tma-signaling-worker-test.js
 node tools/github-pages-check.js
 ```
 

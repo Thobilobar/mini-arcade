@@ -61,6 +61,7 @@
 <script src="../../lib/tma.js"></script>
 <script src="../../lib/chogan.js"></script>
 <script src="../../lib/multiplayer.js"></script>
+<script src="../../lib/live-multiplayer.js"></script>
 <script src="puzzles.js"></script>
 
 <script>
@@ -1103,8 +1104,10 @@ function ChessBotFactory() {
     if(x&&x.end==='resign')G.result={over:true,winner:x.loser==='w'?'b':'w',reason:'resigned',loser:x.loser};
     render();save();if(G.result)setTimeout(function(){end(G.result,true);},0);return true;
   }
+  function mpLiveToken(token,env){ return mpOpenIncoming({token:token,env:env||M.decode(token)}); }
   function mpRender(){
     if(!MP||!isTg()){M.renderStrip(mpHost,null);return;}
+    if(M.live)M.live.attach(MP,mpLiveToken);
     var mine=!G.result&&M.isMine(MP,S.turn),pending=MP.tk&&(!mine||G.result)?MP.tk:'';
     M.renderStrip(mpHost,{match:MP,myTurn:mine,pending:pending,shareText:M.message('Chess',MP)});
   }
@@ -1117,12 +1120,12 @@ function ChessBotFactory() {
   function mpAfterMove(m,code){
     if(!MP||!isTg()||!(code>=0&&Number.isInteger(code)))return;G.mpCodes.push(code);
     var out=M.advance(MP,mpSnapshot(),S.turn,code);MP=out.match;mpRender();
-    M.share(out.token,M.message('Chess',MP));
+    M.deliver(out,M.message('Chess',MP));
   }
   function mpResign(){
     if(!MP||!isTg()||G.result||!M.isMine(MP,S.turn))return;
     var loser=S.turn,st={over:true,winner:loser==='w'?'b':'w',reason:'resigned',loser:loser};
-    var out=M.advance(MP,mpSnapshot(),S.turn,['R',loser],{end:'resign',loser:loser});MP=out.match;G.result=st;mpRender();M.share(out.token,M.message('Chess',MP));end(st,true);
+    var out=M.advance(MP,mpSnapshot(),S.turn,['R',loser],{end:'resign',loser:loser});MP=out.match;G.result=st;mpRender();M.deliver(out,M.message('Chess',MP));end(st,true);
   }
   function mpOpenIncoming(incoming){
     if(incoming&&incoming.error){M.toastReason(incoming.error);return false;}

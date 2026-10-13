@@ -43,6 +43,7 @@
 <script src="../../lib/tma.js"></script>
 <script src="../../lib/chogan.js"></script>
 <script src="../../lib/multiplayer.js"></script>
+<script src="../../lib/live-multiplayer.js"></script>
 <script>
 /* ==== ENGINE START ==== */
 function DotsEngineFactory() {
@@ -555,10 +556,11 @@ if (typeof module !== 'undefined' && module.exports) module.exports = DotsEngine
     if(!base.st.done&&base.st.turn===owner)return false;
     return mpSame(mpSnapshotOf(base.st),env.s);
   }
-  function mpRender(){ if(!MP||!S||S.mode!=='tg'){M.renderStrip(mpHost,null);return;} var mine=M.isMine(MP,S.turn),pending=MP.tk&&(!mine||S.done)?MP.tk:''; M.renderStrip(mpHost,{match:MP,myTurn:mine,pending:pending,shareText:M.message('Dots & Boxes',MP)}); }
+  function mpLiveToken(token,env){ return mpOpenIncoming({token:token,env:env||M.decode(token)}); }
+  function mpRender(){ if(!MP||!S||S.mode!=='tg'){M.renderStrip(mpHost,null);return;} if(M.live)M.live.attach(MP,mpLiveToken); var mine=M.isMine(MP,S.turn),pending=MP.tk&&(!mine||S.done)?MP.tk:''; M.renderStrip(mpHost,{match:MP,myTurn:mine,pending:pending,shareText:M.message('Dots & Boxes',MP)}); }
   function mpApplySnapshot(snap){var z=mpState(snap);if(!z)return false;S=z.st;bd=z.bd;mpActions=[];cur={v:0,r:0,c:0};drawAll();render();save();if(S.done)setTimeout(finish,0);return true;}
   function startTelegramGame(){ stopAi(); var n=S&&S.size?S.size:(prefs.size||5); bd=E.makeBoard(n,n); S={size:n,mode:'tg',level:'medium',daily:null,edges:new Array(bd.E).fill(0),owner:new Array(bd.boxes).fill(0),edgeOwner:{},turn:1,scores:[0,0,0],history:[],turnBoxes:0,done:false,startedAt:Date.now(),elapsed:0,lastEdge:-1,newBoxes:[]}; MP=M.begin('dots',mpSnapshot(),1,null);mpActions=[];cur={v:0,r:0,c:0};drawAll();render();C.ui.toast({icon:'info',title:C.t('mpOpening'),ms:2600});}
-  function mpAfterMove(e,over){if(!MP||S.mode!=='tg')return;mpActions.push(e);if(M.isMine(MP,S.turn)&&!over){M.saveDraft('dots',MP.i,{q:MP.q,s:mpSnapshot(),a:mpActions.slice()});mpRender();return;}var out=M.advance(MP,mpSnapshot(),S.turn,null);MP=out.match;mpActions=[];mpRender();M.share(out.token,M.message('Dots & Boxes',MP));}
+  function mpAfterMove(e,over){if(!MP||S.mode!=='tg')return;mpActions.push(e);if(M.isMine(MP,S.turn)&&!over){M.saveDraft('dots',MP.i,{q:MP.q,s:mpSnapshot(),a:mpActions.slice()});mpRender();return;}var out=M.advance(MP,mpSnapshot(),S.turn,null);MP=out.match;mpActions=[];mpRender();M.deliver(out,M.message('Dots & Boxes',MP));}
   function mpOpenIncoming(incoming){if(incoming&&incoming.error){M.toastReason(incoming.error);return false;}var local=incoming&&incoming.env?M.load('dots',incoming.env.i):null;if(!incoming||!incoming.env||!mpValidate(incoming.env,local)){M.toastReason('bad');return false;}var got=M.receive('dots',incoming);if(!got.ok){M.toastReason(got.reason);if(got.match){MP=got.match;mpApplySnapshot(MP.s);}return !!got.match;}MP=got.match;MP.tk='';M.save(MP);if(!mpApplySnapshot(incoming.env.s))return false;if(got.spectator)C.ui.toast({icon:'info',title:C.t('mpSpectator'),ms:2200});return true;}
   function mpResume(){MP=M.active('dots');if(!MP)return false;var d=M.loadDraft('dots',MP.i);if(d&&d.q===MP.q&&d.s){var ok=mpApplySnapshot(d.s);if(ok)mpActions=d.a||[];return ok;}return mpApplySnapshot(MP.s);}
 

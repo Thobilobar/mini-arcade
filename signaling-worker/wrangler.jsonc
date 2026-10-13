@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "mini-arcade-signal",
+  "main": "src/index.js",
+  "compatibility_date": "2026-10-01",
+  "durable_objects": {
+    "bindings": [
+      { "name": "SIGNAL_ROOMS", "class_name": "SignalRoom" }
+    ]
+  },
+  "exports": {
+    "SignalRoom": { "type": "durable-object", "storage": "sqlite" }
+  },
+  "vars": {
+    "ALLOWED_ORIGINS": "https://thobilobar.github.io"
+  }
+}

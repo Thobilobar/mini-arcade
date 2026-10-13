@@ -16,7 +16,16 @@ Open `www/config.js` and set the public username of the Telegram bot that will o
 window.MINI_ARCADE_CONFIG = Object.assign({
   botUsername: 'YourBotUsername',
   appShortName: '',
-  deepLinkMode: 'fullscreen'
+  deepLinkMode: 'fullscreen',
+  liveMultiplayer: {
+    enabled: true,
+    signalingUrl: '',
+    connectTimeoutMs: 12000,
+    fallbackDelayMs: 8000,
+    ackTimeoutMs: 4500,
+    reconnectMs: 1200,
+    iceServers: []
+  }
 }, window.MINI_ARCADE_CONFIG || {});
 ```
 
@@ -65,6 +74,15 @@ https://YOUR-GITHUB-USERNAME.github.io/YOUR-REPOSITORY/
 
 The workflow uses GitHub's Pages actions and creates an immutable deployment artifact from `www/`. It also adds the current Git commit as `APP_BUILD`, causing the service worker to discover every successful deployment even when the semantic app version does not change.
 
+
+## Enable live multiplayer
+
+GitHub Pages remains the host for Mini Arcade, but automatic live turns need the included signaling Worker. Follow `LIVE_MULTIPLAYER_SETUP.md` to deploy `signaling-worker/` to Cloudflare. Then paste its HTTPS URL into `www/config.js` as `liveMultiplayer.signalingUrl` and push again.
+
+If you skip this step, multiplayer does not break: the six games continue using Telegram turn links exactly as the previous release did.
+
+The repository also contains a manual GitHub Action named **Deploy Mini Arcade signaling worker** if you prefer deploying the Worker from GitHub after adding the required Cloudflare repository secrets.
+
 ## Connect the published URL to Telegram
 
 Create or select the bot in **@BotFather**, then configure Mini Arcade as its **Main Mini App**. Use the exact GitHub Pages HTTPS URL including the repository path and trailing slash, for example:
@@ -87,23 +105,23 @@ You should test that link instead of relying only on opening the raw GitHub Page
 
 ## First production test
 
-Use two Telegram accounts for the multiplayer checks.
+Use two Telegram accounts.
 
-1. Open the bot profile and launch Mini Arcade.
-2. Confirm the displayed Telegram name/photo are correct.
-3. Switch Telegram between light and dark theme and confirm the app follows it.
-4. Open several games and use the Telegram BackButton to return.
-5. Close Mini Arcade, reopen it, and verify progress/settings persisted.
-6. Test at least one solo game through completion.
-7. On account A, open each supported multiplayer game and choose **Telegram friend**.
-8. Make the opening action and send the generated challenge to account B.
-9. On account B, open the link, make a legal turn and send it back.
-10. Repeat for Chess, Reversi, Mancala, Dots & Boxes, Nine Men's Morris and Backgammon.
-11. Dismiss the Telegram share chooser once and confirm **Send move** lets you retry.
-12. Open the same move link twice and confirm the second open is treated as stale/duplicate rather than replaying the move.
-13. Forward a live-match link to a third Telegram account and confirm it opens as a spectator rather than replacing either player.
-14. Close/reopen Telegram during a match and confirm the encrypted active match resumes.
-15. Finish at least one multiplayer game and verify the result screen/rematch flow.
+1. Launch Mini Arcade from the bot and confirm Telegram name/photo, theme and BackButton behavior.
+2. Close/reopen once and confirm progress/settings persist.
+3. Account A opens Chess and chooses **Telegram friend**.
+4. A makes the first move and sends the Telegram invitation to B. This is the only normal Telegram handoff needed.
+5. B opens the invitation. Wait for the multiplayer strip on both devices to show **Live**.
+6. B makes a move. A should see it automatically without opening another message.
+7. Continue several moves in both directions.
+8. Background one device briefly, return, and verify **Reconnecting…** returns to **Live**.
+9. Temporarily interrupt one device's network. If automatic reconnection cannot recover, verify **Send via Telegram** appears and can recover the same match.
+10. Repeat the basic live-turn test for Reversi, Mancala, Dots & Boxes, Nine Men's Morris and Backgammon.
+11. Reopen a duplicate fallback link and confirm it is rejected as stale rather than applying twice.
+12. Forward a bound match link to a third account and confirm spectator mode rather than player replacement.
+13. Finish at least one complete match and verify result/rematch behavior.
+
+For restrictive mobile networks, configure the optional TURN credentials described in `LIVE_MULTIPLAYER_SETUP.md`.
 
 ## Updating the live app later
 

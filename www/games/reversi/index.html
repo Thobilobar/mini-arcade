@@ -41,6 +41,7 @@
 <script src="../../lib/tma.js"></script>
 <script src="../../lib/chogan.js"></script>
 <script src="../../lib/multiplayer.js"></script>
+<script src="../../lib/live-multiplayer.js"></script>
 <script>
 /* ==== ENGINE START ==== */
 function ReversiEngineFactory() {
@@ -448,8 +449,10 @@ if (typeof module !== 'undefined' && module.exports) module.exports = ReversiEng
     return mpSame(mpSnapshotOf(base), env.s);
   }
   function mpSnapshotOf(st) { return { b: st.board.join(''), t: st.turn, l: st.last, d: !!st.done }; }
+  function mpLiveToken(token,env){ return mpOpenIncoming({token:token,env:env||M.decode(token)}); }
   function mpRender() {
     if (!MP || !S || S.mode !== 'tg') { M.renderStrip(mpHost, null); return; }
+    if (M.live) M.live.attach(MP, mpLiveToken);
     var mine = M.isMine(MP, S.turn);
     var pending = MP.tk && (!mine || S.done) ? MP.tk : '';
     M.renderStrip(mpHost, { match: MP, myTurn: mine, pending: pending, shareText: M.message('Reversi', MP) });
@@ -476,7 +479,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = ReversiEng
     }
     var out = M.advance(MP, mpSnapshot(), S.turn, mpActions.slice());
     MP = out.match; mpActions = []; mpRender();
-    M.share(out.token, M.message('Reversi', MP));
+    M.deliver(out, M.message('Reversi', MP));
   }
   function mpOpenIncoming(incoming) {
     if (incoming && incoming.error) { M.toastReason(incoming.error); return false; }

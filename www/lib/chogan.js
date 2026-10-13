@@ -231,12 +231,28 @@
   Chogan.state = state;
   Chogan.telegram = bridge;
 
+  // v1.1.5 removed the old decorative character system. Strip its stale
+  // settings/unlock entries during hydration so encrypted vaults migrate cleanly.
+  function removeLegacyCharacterData() {
+    var changedSettings = false;
+    if (state.settings && Object.prototype.hasOwnProperty.call(state.settings, 'mascot')) {
+      delete state.settings.mascot;
+      changedSettings = true;
+    }
+    var before = Array.isArray(state.unlocks) ? state.unlocks : [];
+    var clean = before.filter(function (key) { return !/^mascot\./.test(String(key)); });
+    if (clean.length !== before.length) { state.unlocks = clean; appStore.set('unlocks', clean); }
+    if (changedSettings) appStore.set('settings', state.settings);
+    appStore.remove('mascotGift');
+  }
+
   function hydrateState() {
     var savedSettings = appStore.get('settings', {});
     state.settings = Object.assign({}, DEFAULT_SETTINGS, savedSettings);
     state.profile = Object.assign({ name: '', country: '', uid: '', telegramId: '', username: '', photoUrl: '', telegramName: '', premium: false }, appStore.get('profile', {}));
     state.coins = appStore.get('coins', 0);
     state.unlocks = appStore.get('unlocks', []);
+    removeLegacyCharacterData();
     state.stats = appStore.get('stats', emptyStats());
     state.counters = appStore.get('counters', {});
 
@@ -270,6 +286,7 @@
     state.profile = Object.assign({ name: '', country: '', uid: state.profile.uid, telegramId: '', username: '', photoUrl: '', telegramName: '', premium: false }, appStore.get('profile', {}));
     state.coins = appStore.get('coins', 0);
     state.unlocks = appStore.get('unlocks', []);
+    removeLegacyCharacterData();
     state.stats = appStore.get('stats', state.stats || emptyStats());
     state.counters = appStore.get('counters', {});
   };
@@ -337,7 +354,7 @@
       today: 'امروز', dailyDone: 'امروز را زدی', dailyOpen: 'هنوز نزدی',
       emptyDaily: 'برای این روز چیزی ثبت نشده',
       sun: 'ی', mon: 'د', tue: 'س', wed: 'چ', thu: 'پ', fri: 'ج', sat: 'ش',
-      unlocks: 'تم‌ها و شخصیت‌ها', unlockCost: 'باز کردن', owned: 'باز شده', apply: 'انتخاب',
+      unlocks: 'تم‌های منو', unlockCost: 'باز کردن', owned: 'باز شده', apply: 'انتخاب',
       tutorial: 'آموزش', gotIt: 'فهمیدم', stars: 'ستاره'
     },
     en: {
@@ -370,7 +387,7 @@
       today: 'Today', dailyDone: 'Done today', dailyOpen: 'Not played yet',
       emptyDaily: 'Nothing recorded for this day',
       sun: 'S', mon: 'M', tue: 'T', wed: 'W', thu: 'T', fri: 'F', sat: 'S',
-      unlocks: 'Themes and characters', unlockCost: 'Unlock', owned: 'Unlocked', apply: 'Select',
+      unlocks: 'Menu themes', unlockCost: 'Unlock', owned: 'Unlocked', apply: 'Select',
       tutorial: 'How to play', gotIt: 'Got it', stars: 'stars'
     },
     zh: {
@@ -403,7 +420,7 @@
       today: '今天', dailyDone: '今天已完成', dailyOpen: '还没玩',
       emptyDaily: '这一天没有记录',
       sun: '日', mon: '一', tue: '二', wed: '三', thu: '四', fri: '五', sat: '六',
-      unlocks: '主题和角色', unlockCost: '解锁', owned: '已解锁', apply: '选择',
+      unlocks: '菜单主题', unlockCost: '解锁', owned: '已解锁', apply: '选择',
       tutorial: '玩法', gotIt: '明白了', stars: '星'
     },
     de: {
@@ -436,7 +453,7 @@
       today: 'Heute', dailyDone: 'Heute erledigt', dailyOpen: 'Noch nicht gespielt',
       emptyDaily: 'Für diesen Tag ist nichts gespeichert',
       sun: 'So', mon: 'Mo', tue: 'Di', wed: 'Mi', thu: 'Do', fri: 'Fr', sat: 'Sa',
-      unlocks: 'Designs und Figuren', unlockCost: 'Freischalten', owned: 'Freigeschaltet', apply: 'Auswählen',
+      unlocks: 'Menüdesigns', unlockCost: 'Freischalten', owned: 'Freigeschaltet', apply: 'Auswählen',
       tutorial: 'Anleitung', gotIt: 'Verstanden', stars: 'Sterne'
     }
   };
@@ -1310,42 +1327,6 @@
       'stroke-linejoin="round" aria-hidden="true"><path d="' + d + '"/></svg>';
   };
 
-  /* شخصیت‌های تزئینی. ساده، دوست‌داشتنی، تماماً وکتور. */
-  var MASCOT = {
-    fox: '<svg viewBox="0 0 120 120" width="{S}" height="{S}" aria-hidden="true">' +
-      '<path d="M22 40 26 16l20 12z" fill="#E07A5F"/><path d="M98 40 94 16 74 28z" fill="#E07A5F"/>' +
-      '<path d="M60 26c22 0 38 16 38 36S82 100 60 100 22 82 22 62s16-36 38-36z" fill="#EE9070"/>' +
-      '<path d="M60 60c14 0 24 10 24 22 0 10-11 18-24 18s-24-8-24-18c0-12 10-22 24-22z" fill="#FBEDE6"/>' +
-      '<circle cx="46" cy="58" r="5" fill="#3A2620"/><circle cx="74" cy="58" r="5" fill="#3A2620"/>' +
-      '<path d="M60 74c3.5 0 6-2.4 6-5s-2.7-4-6-4-6 1.4-6 4 2.5 5 6 5z" fill="#3A2620"/>' +
-      '<path d="M54 82c2 3 10 3 12 0" stroke="#3A2620" stroke-width="3" fill="none" stroke-linecap="round"/></svg>',
-    owl: '<svg viewBox="0 0 120 120" width="{S}" height="{S}" aria-hidden="true">' +
-      '<path d="M60 20c22 0 36 18 36 40s-14 40-36 40S24 82 24 60 38 20 60 20z" fill="#6A8CBF"/>' +
-      '<circle cx="45" cy="52" r="15" fill="#FBEDE6"/><circle cx="75" cy="52" r="15" fill="#FBEDE6"/>' +
-      '<circle cx="45" cy="52" r="6.5" fill="#2C2620"/><circle cx="75" cy="52" r="6.5" fill="#2C2620"/>' +
-      '<path d="M60 60 52 70h16z" fill="#D9A441"/>' +
-      '<path d="M34 30c4-8 10-10 14-6M86 30c-4-8-10-10-14-6" stroke="#4E6C97" stroke-width="4" fill="none" stroke-linecap="round"/>' +
-      '<path d="M44 88c6 6 26 6 32 0" stroke="#4E6C97" stroke-width="4" fill="none" stroke-linecap="round"/></svg>',
-    cat: '<svg viewBox="0 0 120 120" width="{S}" height="{S}" aria-hidden="true">' +
-      '<path d="M28 44 30 20l20 14zM92 44 90 20 70 34z" fill="#E4A853"/>' +
-      '<path d="M60 28c20 0 34 16 34 34S80 98 60 98 26 82 26 62s14-34 34-34z" fill="#F0BC70"/>' +
-      '<circle cx="47" cy="58" r="5.5" fill="#2C2620"/><circle cx="73" cy="58" r="5.5" fill="#2C2620"/>' +
-      '<path d="M60 70c2.6 0 4.6-1.6 4.6-3.4S62.6 64 60 64s-4.6 1-4.6 2.6S57.4 70 60 70z" fill="#C8574B"/>' +
-      '<path d="M60 70v5M56 80c2 2 6 2 8 0" stroke="#2C2620" stroke-width="3" fill="none" stroke-linecap="round"/>' +
-      '<path d="M20 62h16M20 70h16M84 62h16M84 70h16" stroke="#D8A55C" stroke-width="3" stroke-linecap="round"/></svg>',
-    bear: '<svg viewBox="0 0 120 120" width="{S}" height="{S}" aria-hidden="true">' +
-      '<circle cx="32" cy="34" r="14" fill="#7BAE7F"/><circle cx="88" cy="34" r="14" fill="#7BAE7F"/>' +
-      '<circle cx="60" cy="62" r="36" fill="#94C398"/>' +
-      '<circle cx="47" cy="56" r="5" fill="#22301F"/><circle cx="73" cy="56" r="5" fill="#22301F"/>' +
-      '<ellipse cx="60" cy="76" rx="20" ry="14" fill="#E7F2E4"/>' +
-      '<path d="M60 70c3.4 0 6-2 6-4.4s-2.6-3.6-6-3.6-6 1.2-6 3.6 2.6 4.4 6 4.4z" fill="#22301F"/>' +
-      '<path d="M60 74v4M54 82c2 2.6 10 2.6 12 0" stroke="#22301F" stroke-width="3" fill="none" stroke-linecap="round"/></svg>'
-  };
-  Chogan.mascot = function (name, size) {
-    var m = MASCOT[name] || MASCOT.fox;
-    return m.split('{S}').join(size || 120);
-  };
-  Chogan.mascotNames = Object.keys(MASCOT);
 
   /* ====================================================== رابط کاربری */
 

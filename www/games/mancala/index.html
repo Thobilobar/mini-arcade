@@ -41,6 +41,7 @@
 <script src="../../lib/tma.js"></script>
 <script src="../../lib/chogan.js"></script>
 <script src="../../lib/multiplayer.js"></script>
+<script src="../../lib/live-multiplayer.js"></script>
 <script>
 /* ==== ENGINE START ==== */
 function MancalaEngineFactory() {
@@ -417,8 +418,10 @@ if (typeof module !== 'undefined' && module.exports) module.exports = MancalaEng
     for(var k=0;k<acts.length;k++){ var pit=+acts[k]; if(!E.isOwnPit(base.turn,pit)||!base.board[pit]) return false; var info=E.applyMove(base,pit); if(!info) return false; }
     return mpSame(mpSnapshotOf(base),env.s);
   }
+  function mpLiveToken(token,env){ return mpOpenIncoming({token:token,env:env||M.decode(token)}); }
   function mpRender(){
     if(!MP||!S||S.mode!=='tg'){ M.renderStrip(mpHost,null); return; }
+    if(M.live)M.live.attach(MP,mpLiveToken);
     var mine=M.isMine(MP,S.turn), pending=MP.tk&&(!mine||S.done)?MP.tk:'';
     M.renderStrip(mpHost,{match:MP,myTurn:mine,pending:pending,shareText:M.message('Mancala',MP)});
   }
@@ -432,7 +435,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = MancalaEng
   function mpAfterMove(pit, over){
     if(!MP||S.mode!=='tg') return; mpActions.push(pit);
     if(M.isMine(MP,S.turn)&&!over){ M.saveDraft('mancala',MP.i,{q:MP.q,s:mpSnapshot(),a:mpActions.slice()}); mpRender(); return; }
-    var out=M.advance(MP,mpSnapshot(),S.turn,mpActions.slice()); MP=out.match; mpActions=[]; mpRender(); M.share(out.token,M.message('Mancala',MP));
+    var out=M.advance(MP,mpSnapshot(),S.turn,mpActions.slice()); MP=out.match; mpActions=[]; mpRender(); M.deliver(out,M.message('Mancala',MP));
   }
   function mpOpenIncoming(incoming){
     if(incoming&&incoming.error){M.toastReason(incoming.error);return false;}

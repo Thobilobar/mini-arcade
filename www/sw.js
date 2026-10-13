@@ -25,6 +25,7 @@ const SHELL = [
   './lib/tma.js',
   './lib/chogan.js',
   './lib/multiplayer.js',
+  './lib/live-multiplayer.js',
   './fonts/vazirmatn-variable.woff2'
 ];
 

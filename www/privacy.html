@@ -40,12 +40,12 @@
       <div class="pv__hero-mark" aria-hidden="true">✓</div>
       <div>
         <h1>Mini Arcade privacy</h1>
-        <p class="ch-dim">Last updated: 10 October 2026</p>
+        <p class="ch-dim">Last updated: 13 October 2026</p>
       </div>
     </header>
 
     <article class="pv__card pv__card--intro">
-      <p>Mini Arcade is designed as a local-first Telegram Mini App. This project contains no developer analytics, advertising trackers, or developer-operated application backend.</p>
+      <p>Mini Arcade keeps game progress, settings, and profile preferences encrypted on your device. This page explains what the app can read from Telegram, what remains local, and which normal network requests can still occur.</p>
     </article>
 
     <article class="pv__card">
@@ -64,7 +64,7 @@
 
     <article class="pv__card">
       <h2>Network requests</h2>
-      <p>The app loads Telegram's official Mini App bridge and may load your Telegram profile photo from the URL Telegram provides. Your static hosting provider and Telegram can receive ordinary technical request information such as IP address and user agent under their own policies. Mini Arcade itself does not send game progress or profile data to a developer backend.</p>
+      <p>The app loads Telegram's official Mini App bridge and may load your Telegram profile photo from the URL Telegram provides. Your static hosting provider and Telegram can receive ordinary technical request information such as IP address and user agent under their own policies. When Live Friend multiplayer is enabled, a small signaling service receives WebRTC connection-negotiation messages and ordinary connection metadata so two players can establish a direct encrypted peer-to-peer channel. It does not receive or store game moves, game progress, profile preferences, or Telegram profile data. If direct peer-to-peer connectivity fails and TURN is configured, encrypted WebRTC packets may be relayed by the TURN provider.</p>
     </article>
 
     <article class="pv__card">
@@ -74,12 +74,12 @@
 
     <article class="pv__card">
       <h2>Security boundary</h2>
-      <p>The raw Telegram launch data is used only for local presentation in this static app. If a future version adds accounts, leaderboards, purchases, or any trusted server action, the raw Telegram <code>initData</code> must be validated on that server; a bot token must never be embedded in this frontend.</p>
+      <p>The raw Telegram launch data is used only for local presentation and local match identity. The signaling service does not use Telegram <code>initData</code> for authorization and is not an authoritative game server. If a future version adds accounts, leaderboards, purchases, cloud sync, or any trusted server action, raw Telegram <code>initData</code> must be validated on that server; a bot token must never be embedded in this frontend.</p>
     </article>
 
     <article class="pv__card">
       <h2>Young users</h2>
-      <p>The app does not ask for age and does not transmit game progress to a developer backend. Telegram account and platform privacy practices still apply.</p>
+      <p>The app does not ask for age. Game progress remains in the encrypted local vault; Live Friend signaling is limited to connection setup and does not store gameplay. Telegram, the static host, and any configured WebRTC/TURN provider have their own platform privacy practices.</p>
     </article>
   </section>
 
@@ -90,12 +90,12 @@
       <div class="pv__hero-mark" aria-hidden="true">✓</div>
       <div>
         <h1>حریم خصوصی Mini Arcade</h1>
-        <p class="ch-dim">آخرین به‌روزرسانی: ۱۰ اکتبر ۲۰۲۶</p>
+        <p class="ch-dim">آخرین به‌روزرسانی: ۱۳ اکتبر ۲۰۲۶</p>
       </div>
     </header>
 
     <article class="pv__card pv__card--intro">
-      <p>Mini Arcade به‌صورت یک مینی‌اپ تلگرام با رویکرد «محلی‌اول» طراحی شده است. در این پروژه تحلیل‌گر توسعه‌دهنده، ردیاب تبلیغاتی یا بک‌اند اختصاصی برنامه وجود ندارد.</p>
+      <p>Mini Arcade پیشرفت بازی‌ها، تنظیمات و ترجیحات پروفایل را به‌صورت رمزگذاری‌شده روی دستگاه نگه می‌دارد. این صفحه توضیح می‌دهد برنامه چه اطلاعاتی را از تلگرام می‌خواند، چه داده‌هایی محلی می‌مانند و چه درخواست‌های عادی شبکه ممکن است انجام شوند.</p>
     </article>
 
     <article class="pv__card">
@@ -114,7 +114,7 @@
 
     <article class="pv__card">
       <h2>درخواست‌های شبکه</h2>
-      <p>برنامه پل رسمی Mini App تلگرام را بارگذاری می‌کند و ممکن است عکس پروفایل را از نشانی‌ای که تلگرام می‌دهد دریافت کند. سرویس میزبانی و تلگرام می‌توانند طبق سیاست‌های خود اطلاعات فنی عادی درخواست‌ها مانند IP و user-agent را ببینند. خود Mini Arcade پیشرفت بازی یا دادهٔ پروفایل را به بک‌اند توسعه‌دهنده ارسال نمی‌کند.</p>
+      <p>برنامه پل رسمی Mini App تلگرام را بارگذاری می‌کند و ممکن است عکس پروفایل را از نشانی‌ای که تلگرام می‌دهد دریافت کند. سرویس میزبانی و تلگرام می‌توانند طبق سیاست‌های خود اطلاعات فنی عادی درخواست‌ها مانند IP و user-agent را ببینند. وقتی حالت Live Friend فعال باشد، یک سرویس کوچک سیگنالینگ فقط پیام‌های لازم برای برقراری اتصال WebRTC و اطلاعات فنی عادی اتصال را دریافت می‌کند تا دو بازیکن یک کانال مستقیم و رمزگذاری‌شده بسازند. این سرویس حرکت‌های بازی، پیشرفت بازی، ترجیحات پروفایل یا اطلاعات پروفایل تلگرام را دریافت یا ذخیره نمی‌کند. اگر اتصال مستقیم ممکن نباشد و TURN تنظیم شده باشد، بسته‌های رمزگذاری‌شدهٔ WebRTC ممکن است از سرویس TURN عبور کنند.</p>
     </article>
 
     <article class="pv__card">

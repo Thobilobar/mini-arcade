@@ -21,8 +21,9 @@
       mpConfigTitle: 'Telegram multiplayer setup', mpConfigBody: 'Set botUsername in www/config.js before deployment so challenge links can reopen this Mini App.',
       mpBadLink: 'This multiplayer link is invalid or damaged.', mpWrongGame: 'This link belongs to another game.',
       mpStale: 'That move was already applied.', mpChain: 'This update does not continue your saved match.',
-      mpOtherPlayer: 'This match already belongs to two other players.', mpSendHint: 'Telegram must ask you where to send each move; no backend is used.',
-      mpMatch: 'Telegram match', mpLeave: 'Leave match', mpLeaveAsk: 'Leave this Telegram match and start a normal game?'
+      mpOtherPlayer: 'This match already belongs to two other players.', mpSendHint: 'Send this update through Telegram if live play is unavailable.',
+      mpMatch: 'Friend match', mpLive: 'Live', mpConnecting: 'Connecting live…', mpReconnecting: 'Reconnecting…', mpOffline: 'Live unavailable', mpFallback: 'Send via Telegram', mpInvite: 'Invite friend', mpPeerLeft: 'Opponent disconnected',
+      mpMatchReady: 'Live connection ready', mpLeave: 'Leave match', mpLeaveAsk: 'Leave this friend match and start a normal game?'
     },
     fa: { tgFriend:'دوست تلگرامی', mpYou:'تو', mpWaiting:'منتظر {n}', mpYourTurn:'نوبت توست', mpOpening:'حرکت اول را انجام بده و بعد برای دوستت بفرست.', mpSendMove:'فرستادن حرکت', mpSendChallenge:'فرستادن دعوت', mpJoined:'پیوستی به {n}', mpSpectator:'حالت تماشاچی', mpConfigTitle:'تنظیم چندنفره تلگرام', mpConfigBody:'پیش از انتشار، botUsername را در www/config.js تنظیم کن تا لینک بازی دوباره همین مینی‌اپ را باز کند.', mpBadLink:'این لینک بازی خراب یا نامعتبر است.', mpWrongGame:'این لینک برای بازی دیگری است.', mpStale:'این حرکت قبلاً اعمال شده.', mpChain:'این به‌روزرسانی ادامه‌ی مسابقه‌ی ذخیره‌شده نیست.', mpOtherPlayer:'این مسابقه از قبل دو بازیکن دیگر دارد.', mpSendHint:'تلگرام برای هر حرکت باید مقصد را از تو بپرسد؛ سروری در کار نیست.', mpMatch:'مسابقه تلگرامی', mpLeave:'خروج از مسابقه', mpLeaveAsk:'از این مسابقه تلگرامی خارج شوی و بازی عادی شروع کنی؟' },
     zh: { tgFriend:'Telegram 好友', mpYou:'你', mpWaiting:'等待 {n}', mpYourTurn:'轮到你', mpOpening:'先走第一步，然后发给好友。', mpSendMove:'发送这一步', mpSendChallenge:'发送挑战', mpJoined:'已加入 {n}', mpSpectator:'观战模式', mpConfigTitle:'Telegram 多人设置', mpConfigBody:'部署前请在 www/config.js 中设置 botUsername，这样挑战链接才能重新打开此小程序。', mpBadLink:'多人链接无效或已损坏。', mpWrongGame:'此链接属于其他游戏。', mpStale:'这一步已经应用过了。', mpChain:'此更新无法接上你保存的对局。', mpOtherPlayer:'此对局已经有两名其他玩家。', mpSendHint:'由于没有后端，每一步都需要 Telegram 让你选择发送对象。', mpMatch:'Telegram 对局', mpLeave:'离开对局', mpLeaveAsk:'离开此 Telegram 对局并开始普通游戏？' },
@@ -49,11 +50,11 @@
   function hash(s) { return (C.hash32(String(s)) >>> 0).toString(36).padStart(7,'0').slice(-7); }
 
   var GC={chess:'c',reversi:'r',mancala:'m',dots:'d',morris:'o',backgammon:'b'}, CG={c:'chess',r:'reversi',m:'mancala',d:'dots',o:'morris',b:'backgammon'};
-  function compactEnv(e){ return [GC[e.g]||e.g,e.i,e.q,e.a||0,e.b||0,e.u||0,e.t,e.s,e.m==null?0:e.m,e.p||0,e.x||0]; }
+  function compactEnv(e){ return [GC[e.g]||e.g,e.i,e.q,e.a||0,e.b||0,e.u||0,e.t,e.s,e.m==null?0:e.m,e.p||0,e.x||0,e.l||0]; }
   function expandEnv(a){
     if(!Array.isArray(a)||a.length<8)return null;
     var g=CG[a[0]]||a[0];
-    return {v:1,g:g,i:a[1],q:+a[2],a:a[3]||null,b:a[4]||null,u:a[5]||[1,2],t:a[6],s:a[7],m:a[8]===0?null:a[8],p:a[9]===0?'':a[9],x:a[10]===0?null:a[10]};
+    return {v:1,g:g,i:a[1],q:+a[2],a:a[3]||null,b:a[4]||null,u:a[5]||[1,2],t:a[6],s:a[7],m:a[8]===0?null:a[8],p:a[9]===0?'':a[9],x:a[10]===0?null:a[10],l:a[11]===0||a[11]==null?'':a[11]};
   }
   function bytesB64u(bytes){ var bin=''; for(var i=0;i<bytes.length;i++)bin+=String.fromCharCode(bytes[i]); return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
   function b64uBytes(s){ s=String(s||'').replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';var bin=atob(s),o=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)o[i]=bin.charCodeAt(i);return o; }
@@ -112,6 +113,10 @@
     var a=new Uint8Array(8); try { crypto.getRandomValues(a); } catch(e){ for(var i=0;i<a.length;i++)a[i]=(Math.random()*256)|0; }
     var s=''; for(var j=0;j<a.length;j++)s+=a[j].toString(36).padStart(2,'0'); return s.slice(0,14);
   }
+  function randomSecret() {
+    var a=new Uint8Array(16); try { crypto.getRandomValues(a); } catch(e){ for(var i=0;i<a.length;i++)a[i]=(Math.random()*256)|0; }
+    return bytesB64u(a);
+  }
   function shortName(v) {
     var chars=Array.from(String(v||'')),out='';
     for(var i=0;i<chars.length;i++){var next=out+chars[i];if(new TextEncoder().encode(next).length>18)break;out=next;}
@@ -164,7 +169,7 @@
 
   function begin(game, snapshot, turn, extra, sides) {
     var me=ident();
-    var m={v:1,g:game,i:randomId(),q:0,a:me,b:null,u:sides||[1,2],t:turn,s:snapshot,x:extra||null,sg:'',sp:false};
+    var m={v:1,g:game,i:randomId(),q:0,a:me,b:null,u:sides||[1,2],t:turn,s:snapshot,x:extra||null,l:randomSecret(),sg:'',sp:false};
     save(m); return m;
   }
   function role(m) {
@@ -210,7 +215,7 @@
     m.p=m.sg||''; m.q=(m.q||0)+1; m.s=snapshot; m.t=turn; m.m=action===undefined?null:action;
     if(extra!==undefined) m.x=extra;
     m.a=m.a||me;
-    var env={v:1,g:m.g,i:m.i,q:m.q,a:m.a,b:m.b,u:m.u||[1,2],t:m.t,s:m.s,m:m.m,p:m.p,x:m.x||null};
+    var env={v:1,g:m.g,i:m.i,q:m.q,a:m.a,b:m.b,u:m.u||[1,2],t:m.t,s:m.s,m:m.m,p:m.p,x:m.x||null,l:m.l||''};
     var token=encode(env), decoded=decode(token);
     m.sg=decoded?decoded._sig:''; m.tk=token;
     clearDraft(m.g,m.i);
@@ -251,27 +256,50 @@
   }
   function renderStrip(host, o) {
     if(!host) return;
-    host.innerHTML='';
-    if(!o || !o.match){ host.hidden=true; return; }
-    host.hidden=false;
+    host._maMpOpts=o||null;
+    if(!o || !o.match){ host.innerHTML='';host.hidden=true; return; }
+    host.innerHTML=''; host.hidden=false;
     var m=o.match, r=role(m), op=opponent(m), name=op&&op[1]?op[1]:C.t('player2');
+    var live=C.multiplayer&&C.multiplayer.live, ls=live&&live.state?live.state(m):null;
+    var connected=!!(ls&&ls.status==='connected'), connecting=!!(ls&&(ls.status==='connecting'||ls.status==='waiting'));
     var status=m.sp?C.t('mpSpectator'):(o.myTurn?C.t('mpYourTurn'):C.t('mpWaiting',{n:name}));
+    var badgeText=connected?C.t('mpLive'):C.t('mpMatch');
+    var badgeClass='ch-badge '+(connected?'ch-badge--good':'ch-badge--accent');
     host.appendChild(C.el('div',{class:'ma-mp__meta'},[
-      C.el('span',{class:'ch-badge ch-badge--accent'},[C.icon('user',14),C.el('span',{text:C.t('mpMatch')})]),
+      C.el('span',{class:badgeClass},[C.icon(connected?'bolt':'user',14),C.el('span',{text:badgeText})]),
       C.el('span',{class:'ma-mp__status',text:status})
     ]));
-    if(o.pending && !m.sp){
-      var b=C.el('button',{class:'ch-btn ch-btn--primary ch-btn--sm',type:'button',text:C.t(m.q<=1?'mpSendChallenge':'mpSendMove')});
+    if(!m.sp && !connected && ls && ls.status && ls.status!=='disabled'){
+      host.appendChild(C.el('span',{class:'ma-mp__live '+(connecting?'is-connecting':'is-offline'),text:C.t(connecting?(ls.status==='waiting'?'mpWaiting':'mpConnecting'):(ls.status==='reconnecting'?'mpReconnecting':'mpOffline'),{n:name})}));
+    }
+    if(o.pending && !m.sp && !connected){
+      var label=(m.q<=1&&!m.b)?C.t('mpInvite'):(ls&&ls.fallbackReady?C.t('mpFallback'):C.t(m.q<=1?'mpSendChallenge':'mpSendMove'));
+      var b=C.el('button',{class:'ch-btn ch-btn--primary ch-btn--sm',type:'button',text:label});
       b.addEventListener('click',function(){ share(o.pending,o.shareText||''); });
       host.appendChild(b);
     }
     if(r===2 && !m.b) host.appendChild(C.el('span',{class:'ch-dim ma-mp__join',text:C.t('mpJoined',{n:m.a&&m.a[1]||''})}));
   }
+  function refreshStrips(){
+    try{document.querySelectorAll('.ma-mp').forEach(function(h){if(h._maMpOpts)renderStrip(h,h._maMpOpts);});}catch(e){}
+  }
+  function deliver(out,text){
+    if(!out||!out.token||!out.match)return false;
+    var live=C.multiplayer&&C.multiplayer.live;
+    if(live&&live.deliver){
+      var result=live.deliver(out.match,out.token,text||'');
+      if(result==='live'){refreshStrips();return true;}
+      if(result==='queued'){refreshStrips();return true;}
+      if(result==='invite')return share(out.token,text||'');
+    }
+    return share(out.token,text||'');
+  }
+
 
   C.multiplayer={
     allowed:ALLOWED, encode:encode, decode:decode, routeIncoming:routeIncoming, takeIncoming:takeIncoming,
     begin:begin, receive:receive, advance:advance, save:save, load:load, active:active, drop:drop, clearActive:clearActive, saveDraft:saveDraft, loadDraft:loadDraft, clearDraft:clearDraft, role:role,
     opponent:opponent, sideForRole:sideForRole, isMine:isMine, currentName:currentName, deepLink:deepLink, share:share,
-    message:message, toastReason:toastReason, renderStrip:renderStrip, identity:ident
+    message:message, toastReason:toastReason, renderStrip:renderStrip, refreshStrips:refreshStrips, deliver:deliver, identity:ident
   };
 })(window);
