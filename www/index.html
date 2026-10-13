@@ -298,7 +298,7 @@
         C.feedback('select');
         render();
       } }, [C.icon(asList ? 'grid' : 'list', 20)]);
-    var sec = el('div', { class: 'ch-section' }, [sectionHead(C.t('allGames'), viewBtn)]);
+    var sec = el('div', { class: 'ch-section ch-games-panel' }, [sectionHead(C.t('allGames'), viewBtn)]);
     var grid = el('div', { class: 'ch-games' + (asList ? '' : ' ch-games--grid') });
     GAMES.forEach(function (g, i) {
       var badges = el('div', { class: 'ch-game__meta' });

@@ -312,6 +312,28 @@ a  { color: var(--c-accent); text-decoration: none; }
 .ch-tap:active { transform: scale(.975); box-shadow: var(--sh-1); }
 
 /* کارت بازی */
+/* The game library is intentionally a layer above the page background. The
+   individual tiles then sit one level above this panel so they read as real
+   controls instead of labels floating on the page. */
+.ch-games-panel {
+  position: relative;
+  padding: 14px;
+  border-radius: 26px;
+  background: var(--c-surface-2);
+  background: color-mix(in srgb, var(--c-surface-2) 82%, var(--c-surface) 18%);
+  border: 1px solid var(--c-line);
+  border-color: color-mix(in srgb, var(--c-line) 72%, transparent);
+  box-shadow: var(--sh-1);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 7%, transparent), var(--sh-1);
+}
+.ch-games-panel .ch-section__head {
+  margin-bottom: 14px;
+  padding-inline: 2px;
+}
+.ch-games-panel .ch-section__head h2 {
+  letter-spacing: -.01em;
+}
+
 .ch-games { display: grid; gap: var(--s-3); }
 @media (min-width: 620px) { .ch-games { grid-template-columns: 1fr 1fr; } }
 
@@ -322,6 +344,56 @@ a  { color: var(--c-accent); text-decoration: none; }
   padding: var(--s-4);
   position: relative;
   overflow: hidden;
+  isolation: isolate;
+  background: var(--c-surface);
+  background:
+    linear-gradient(150deg,
+      color-mix(in srgb, var(--c-surface) 91%, var(--game) 9%) 0%,
+      var(--c-surface) 68%);
+  border-color: var(--c-line);
+  border-color: color-mix(in srgb, var(--game) 16%, var(--c-line));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 8%, transparent),
+    0 2px 5px rgba(0, 0, 0, .08),
+    0 9px 22px rgba(0, 0, 0, .10);
+  transition:
+    transform var(--t-fast) var(--ease),
+    box-shadow var(--t-fast) var(--ease),
+    border-color var(--t-fast) var(--ease),
+    background var(--t-fast) var(--ease);
+}
+.ch-game::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  width: 90px;
+  height: 90px;
+  inset-block-start: -46px;
+  inset-inline-end: -34px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--game) 13%, transparent);
+  pointer-events: none;
+}
+.ch-game:active {
+  transform: translateY(1px) scale(.982);
+  border-color: color-mix(in srgb, var(--game) 28%, var(--c-line));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 6%, transparent),
+    0 2px 5px rgba(0, 0, 0, .10);
+}
+.ch-game:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--game) 52%, var(--c-accent));
+  outline-offset: 2px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .ch-game:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--game) 30%, var(--c-line));
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, #fff 10%, transparent),
+      0 4px 10px rgba(0, 0, 0, .10),
+      0 14px 28px rgba(0, 0, 0, .12);
+  }
 }
 .ch-game__icon {
   width: 62px; height: 62px;
@@ -330,6 +402,11 @@ a  { color: var(--c-accent); text-decoration: none; }
   background: var(--game-soft, var(--c-surface-2));
   display: grid; place-items: center;
   overflow: hidden;
+  border: 1px solid var(--c-line);
+  border-color: color-mix(in srgb, var(--game) 18%, var(--c-line));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .18),
+    0 4px 10px rgba(0, 0, 0, .11);
 }
 .ch-game__icon svg, .ch-game__icon img { width: 100%; height: 100%; display: block; }
 .ch-game__body { flex: 1; min-width: 0; }
@@ -444,10 +521,18 @@ html.is-telegram-mini-app body.ma-menu .ch-daily-hero h2 {
 html.is-telegram-mini-app body.ma-menu .ch-section {
   margin-bottom: var(--s-5);
 }
+html.is-telegram-mini-app body.ma-menu .ch-games-panel {
+  padding: 12px;
+  border-radius: 24px;
+  background: var(--c-surface-2);
+  background: color-mix(in srgb, var(--c-surface-2) 86%, var(--c-surface) 14%);
+}
+html.is-telegram-mini-app body.ma-menu .ch-games--grid {
+  gap: 11px;
+}
 html.is-telegram-mini-app body.ma-menu .ch-games--grid .ch-game {
   aspect-ratio: 1.08 / 1;
   padding: 12px;
-  box-shadow: var(--sh-1);
 }
 html.is-telegram-mini-app body.ma-menu .ch-games--grid .ch-game__icon {
   width: 52px;

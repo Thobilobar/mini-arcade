@@ -1,7 +1,7 @@
 # Mini Arcade TMA — QA Report
 
-Release: **1.1.2**  
-Prepared: **11 October 2026**
+Release: **1.1.3**  
+Prepared: **13 October 2026**
 
 ## Automated release gates
 
@@ -26,9 +26,9 @@ Coverage includes Telegram secure/device storage selection, lifecycle, user hydr
 
 `node tools/tma-ui-check.js`
 
-Result: **16/16 passed**.
+Result: **22/22 passed**.
 
-Coverage includes Telegram ThemeParams mapping for section/text/button/separator colors, native bottom-bar synchronization, duplicate home-title suppression while Telegram chrome is visible, fullscreen-aware title restoration, compact TMA spacing, denser game tiles, and Telegram color-scheme tracking for Auto theme.
+Coverage includes Telegram ThemeParams mapping for section/text/button/separator colors, native bottom-bar synchronization, duplicate home-title suppression while Telegram chrome is visible, fullscreen-aware title restoration, compact TMA spacing, denser game tiles, Telegram color-scheme tracking for Auto theme, the layered Games section, elevated/tinted game surfaces, per-game accent treatment, tactile press feedback and icon elevation.
 
 ### Game-engine migration smoke — PASS
 
@@ -90,4 +90,4 @@ Coverage includes the included GitHub Actions Pages workflow, `.nojekyll`, deplo
 
 A second HTTP smoke mounted the exact `www/` tree at `/repository/` and returned **HTTP 200 with non-empty bodies** for the menu, configuration, version, service worker, manifest, catalogue, Telegram bridge, multiplayer runtime, Chess, Backgammon and privacy page. The workflow YAML also parsed successfully.
 
-With the existing 274 TMA/game/multiplayer assertions, 16 Telegram-native UI assertions, and 402 GitHub Pages assertions, this release records **692 passing automated assertions** before packaging.
+With the existing 274 TMA/game/multiplayer assertions, 22 Telegram-native UI assertions, and 402 GitHub Pages assertions, this release records **698 passing automated assertions** before packaging.

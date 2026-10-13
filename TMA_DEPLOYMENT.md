@@ -65,7 +65,7 @@ If all persistent browser storage is unavailable, the app can still run in memor
 
 ## 6. Service worker releases
 
-`www/sw.js` uses the Mini Arcade cache namespace and includes the Telegram bridge/app shell in its cache list. `www/version.js` is the release version source. This package is version `1.1.2`.
+`www/sw.js` uses the Mini Arcade cache namespace and includes the Telegram bridge/app shell in its cache list. `www/version.js` is the release version source. This package is version `1.1.3`.
 
 The included GitHub Pages workflow appends `APP_BUILD=<first 12 chars of the Git commit SHA>` to the **deployed copy** of `version.js`. This changes the cache namespace on every successful deployment without modifying the committed release file, fixing the common case where `config.js` or another shell file changes while the semantic version stays the same.
 

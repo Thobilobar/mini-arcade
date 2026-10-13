@@ -22,6 +22,12 @@ ok(/not\(\.is-tg-fullscreen\)[\s\S]*ch-head--home[\s\S]*ch-head__title[\s\S]*dis
 ok(/is-tg-fullscreen/.test(css) && !/is-tg-fullscreen[^\n]*ch-head__title[^\n]*display:\s*none/.test(css), 'fullscreen can restore the in-app wordmark when native chrome is absent');
 ok(/body\.ma-menu \.ch-page[\s\S]*padding-top/.test(css), 'Telegram menu uses compact top spacing');
 ok(/ch-games--grid \.ch-game[\s\S]*aspect-ratio:\s*1\.08\s*\/\s*1/.test(css), 'Telegram game tiles are shortened to reduce first-screen crowding');
+ok(/ch-section ch-games-panel/.test(index), 'game library has a dedicated layered section surface');
+ok(/\.ch-games-panel[\s\S]*background:\s*color-mix/.test(css), 'games panel is visually separated from the page background');
+ok(/\.ch-game[\s\S]*linear-gradient\(150deg/.test(css), 'individual game tiles use a raised tinted surface');
+ok(/\.ch-game::after[\s\S]*var\(--game\)/.test(css), 'game tiles carry a restrained per-game color accent');
+ok(/\.ch-game:active[\s\S]*translateY\(1px\) scale\(\.982\)/.test(css), 'game tiles provide tactile press feedback');
+ok(/\.ch-game__icon[\s\S]*box-shadow/.test(css), 'game icons have their own elevated visual layer');
 ok(/--tg-theme-bottom-bar/.test(css), 'fixed navigation follows Telegram bottom-bar color');
 ok(/section_bg_color/.test(tma) && /section_separator_color/.test(tma), 'bridge consumes modern Telegram section theme parameters');
 ok(/setBottomBarColor/.test(tma), 'bridge synchronizes Telegram native bottom bar color');
