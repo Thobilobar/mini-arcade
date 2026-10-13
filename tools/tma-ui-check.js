@@ -10,6 +10,7 @@ const index = read('www/index.html');
 const css = read('www/lib/chogan.css');
 const tma = read('www/lib/tma.js');
 const core = read('www/lib/chogan.js');
+const privacy = read('www/privacy.html');
 
 ok(/<body class="ma-menu">/.test(index), 'menu page is explicitly identifiable for Telegram-only layout tuning');
 ok(/ch-head ch-head--home/.test(index), 'home header has a dedicated compact-TMA hook');
@@ -33,6 +34,20 @@ ok(/section_bg_color/.test(tma) && /section_separator_color/.test(tma), 'bridge 
 ok(/setBottomBarColor/.test(tma), 'bridge synchronizes Telegram native bottom bar color');
 ok(/fullscreenChanged/.test(tma) && /is-tg-fullscreen/.test(tma), 'bridge tracks fullscreen state for adaptive chrome');
 ok(/is-telegram-theme-auto/.test(core) && /tg\.colorScheme/.test(core), 'Auto theme follows Telegram color scheme rather than host OS');
+
+ok(/ch-page--daily ch-page--layered/.test(index), 'Daily page uses the shared layered non-game composition');
+ok(/ch-daily-panel/.test(index) && /ch-calendar-card/.test(index), 'Daily calendar is nested inside a dedicated section surface');
+ok(/ch-stats--elevated/.test(index), 'Daily/Profile summary metrics use elevated statistic cards');
+ok(/ch-page--profile ch-page--layered/.test(index), 'Profile page uses the shared layered non-game composition');
+ok(/ch-profile-hero/.test(index) && /ch-profile-fields/.test(index), 'profile identity/editor has a dedicated raised hero surface');
+ok(/ch-profile-panel/.test(index) && /ch-list-card/.test(index), 'Profile subsections use layered panels with raised content cards');
+ok(/ch-soft-row/.test(index), 'settings, per-game and reset rows use soft nested row surfaces');
+ok(/ch-modal-game-list/.test(index) && /ch-modal-game-row/.test(index), 'Daily detail modal follows the layered row design');
+ok(/body\.ma-menu \.ch-welcome__in[\s\S]*border-radius:\s*26px/.test(css), 'first-run onboarding has a raised contained surface');
+ok(/class="ma-privacy"/.test(privacy) && /pv__hero/.test(privacy) && /pv__card/.test(privacy), 'Privacy page uses the same layered card language');
+ok(/is-telegram-mini-app body\.ma-privacy/.test(privacy) && /--tg-theme-section-bg/.test(privacy), 'Privacy surfaces inherit Telegram ThemeParams directly');
+ok(/body\.ma-menu \.ch-layer-panel[\s\S]*background:\s*color-mix/.test(css), 'shared non-game section layer is visually distinct from page background');
+ok(/body\.ma-menu \.ch-soft-row[\s\S]*border-radius:\s*14px/.test(css), 'nested profile/settings rows have clear card affordance');
 
 console.log(`\nTMA UI integration: ${pass}/${pass + fail} passed`);
 if (fail) process.exit(1);

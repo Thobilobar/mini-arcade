@@ -332,8 +332,8 @@
   /* --------------------------------------------------------- روزانه */
 
   function viewDaily() {
-    var page = el('div', { class: 'ch-page' });
-    page.appendChild(el('div', { class: 'ch-head' }, [
+    var page = el('div', { class: 'ch-page ch-page--daily ch-page--layered' });
+    page.appendChild(el('div', { class: 'ch-head ch-head--section' }, [
       el('div', { class: 'ch-head__title' }, [
         el('h1', { text: C.t('daily') }),
         el('p', { text: C.t('todayChallengeSub') })
@@ -345,7 +345,7 @@
     var cur = new Date(today.getFullYear(), today.getMonth(), 1);
 
     var monthLabel = el('h2');
-    var calWrap = el('div', { class: 'ch-card' });
+    var calWrap = el('div', { class: 'ch-card ch-calendar-card' });
 
     function monthName(d) {
       try {
@@ -393,7 +393,7 @@
       calWrap.appendChild(grid);
     }
 
-    var nav = el('div', { class: 'ch-row', style: { 'margin-bottom': 'var(--s-3)' } }, [
+    var nav = el('div', { class: 'ch-row ch-daily-monthbar' }, [
       el('button', { class: 'ch-iconbtn', type: 'button', 'aria-label': 'قبلی', onclick: function () {
         cur = new Date(cur.getFullYear(), cur.getMonth() - 1, 1); C.feedback('select'); drawCal();
       } }, [C.icon(C.isRtl() ? 'forward' : 'back', 20)]),
@@ -404,26 +404,27 @@
         cur = next; C.feedback('select'); drawCal();
       } }, [C.icon(C.isRtl() ? 'back' : 'forward', 20)])
     ]);
-    page.appendChild(nav);
-    page.appendChild(calWrap);
+    page.appendChild(el('div', { class: 'ch-section ch-layer-panel ch-daily-panel' }, [nav, calWrap]));
     drawCal();
 
     var st = C.stats.get();
-    page.appendChild(el('div', { class: 'ch-stats', style: { 'margin-top': 'var(--s-5)' } }, [
+    page.appendChild(el('div', { class: 'ch-section ch-layer-panel ch-daily-summary' }, [
+      el('div', { class: 'ch-stats ch-stats--elevated' }, [
       el('div', { class: 'ch-stat' }, [el('b', { text: C.num(C.counter('dailyDone')) }), el('span', { text: C.t('daily') })]),
       el('div', { class: 'ch-stat' }, [el('b', { text: C.num(st.streak.count) }), el('span', { text: C.t('streak') })]),
       el('div', { class: 'ch-stat' }, [el('b', { text: C.num(st.streak.best || 0) }), el('span', { text: C.t('best') })])
+      ])
     ]));
     return page;
   }
 
   function dayModal(key) {
     var rec = C.stats.dailyOf(key);
-    var list = el('div', { class: 'ch-list' });
+    var list = el('div', { class: 'ch-list ch-modal-game-list' });
     dailyGames().forEach(function (g) {
       var r = rec[g.id];
-      list.appendChild(el('div', { class: 'ch-item' }, [
-        el('div', { style: { width: '34px', height: '34px', 'border-radius': '10px', overflow: 'hidden', flex: '0 0 34px' } },
+      list.appendChild(el('div', { class: 'ch-item ch-modal-game-row', style: { '--game': g.color, '--game-soft': g.soft } }, [
+        el('div', { class: 'ch-mini-game-icon' },
           [el('img', { src: g.icon, alt: '', width: 34, height: 34 })]),
         el('div', { class: 'ch-item__label' }, [
           el('div', { text: gname(g) }),
@@ -450,26 +451,22 @@
   /* ------------------------------------------------- پروفایل و تنظیمات */
 
   function viewProfile() {
-    var page = el('div', { class: 'ch-page' });
+    var page = el('div', { class: 'ch-page ch-page--profile ch-page--layered' });
     var st = C.stats.get();
 
-    page.appendChild(el('div', { class: 'ch-head' }, [
+    page.appendChild(el('div', { class: 'ch-head ch-head--section' }, [
       el('div', { class: 'ch-head__title' }, [el('h1', { text: C.t('profile') })]),
       coinPill()
     ]));
 
     // شناسنامه
     var nameInput = el('input', {
-      type: 'text', value: C.state.profile.name, maxlength: '48',
-      placeholder: C.t('name') + ' (' + C.t('optional') + ')',
-      style: { flex: '1', 'min-width': '0', font: 'inherit', padding: '10px 14px', 'border-radius': 'var(--r-md)',
-        border: '1px solid var(--c-line)', background: 'var(--c-surface-2)', color: 'var(--c-text)' }
+      class: 'ch-field ch-profile-name', type: 'text', value: C.state.profile.name, maxlength: '48',
+      placeholder: C.t('name') + ' (' + C.t('optional') + ')'
     });
     var countryInput = el('input', {
-      type: 'text', value: C.state.profile.country, maxlength: '2',
-      placeholder: C.t('country') + ' (IR)',
-      style: { width: '86px', font: 'inherit', 'text-align': 'center', padding: '10px', 'border-radius': 'var(--r-md)',
-        border: '1px solid var(--c-line)', background: 'var(--c-surface-2)', color: 'var(--c-text)', 'text-transform': 'uppercase' }
+      class: 'ch-field ch-profile-country', type: 'text', value: C.state.profile.country, maxlength: '2',
+      placeholder: C.t('country') + ' (IR)'
     });
     function saveProfile() {
       C.state.profile.name = nameInput.value.trim().slice(0, 48);
@@ -479,7 +476,7 @@
     nameInput.addEventListener('change', saveProfile);
     countryInput.addEventListener('change', saveProfile);
 
-    page.appendChild(el('div', { class: 'ch-card', style: { 'margin-bottom': 'var(--s-4)' } }, [
+    page.appendChild(el('div', { class: 'ch-card ch-profile-hero' }, [
       el('div', { class: 'ch-row', style: { 'margin-bottom': 'var(--s-3)' } }, [
         profileAvatar(56),
         el('div', { class: 'ch-grow' }, [
@@ -487,13 +484,13 @@
           el('div', { class: 'ch-xs ch-faint', text: C.state.profile.username ? ('@' + C.state.profile.username) : (C.telegram && C.telegram.isTelegram && C.telegram.isTelegram() ? C.t('telegramConnected') : C.state.profile.uid) })
         ])
       ]),
-      el('div', { class: 'ch-row' }, [nameInput, countryInput])
+      el('div', { class: 'ch-row ch-profile-fields' }, [nameInput, countryInput])
     ]));
 
     // آمار
-    page.appendChild(el('div', { class: 'ch-section' }, [
+    page.appendChild(el('div', { class: 'ch-section ch-layer-panel ch-profile-panel' }, [
       sectionHead(C.t('statsTitle')),
-      el('div', { class: 'ch-stats' }, [
+      el('div', { class: 'ch-stats ch-stats--elevated' }, [
         el('div', { class: 'ch-stat' }, [el('b', { text: C.num(st.plays) }), el('span', { text: C.t('totalPlays') })]),
         el('div', { class: 'ch-stat' }, [el('b', { text: C.duration(st.timeMs) }), el('span', { text: C.t('playTime') })]),
         el('div', { class: 'ch-stat' }, [el('b', { text: C.num(st.streak.count) }), el('span', { text: C.t('streak') })]),
@@ -501,11 +498,11 @@
       ])
     ]));
 
-    var per = el('div', { class: 'ch-card' });
+    var per = el('div', { class: 'ch-card ch-list-card' });
     GAMES.forEach(function (g) {
       var s = st.byGame[g.id];
-      per.appendChild(el('div', { class: 'ch-item' }, [
-        el('div', { style: { width: '30px', height: '30px', 'border-radius': '9px', overflow: 'hidden', flex: '0 0 30px' } },
+      per.appendChild(el('div', { class: 'ch-item ch-soft-row', style: { '--game': g.color, '--game-soft': g.soft } }, [
+        el('div', { class: 'ch-mini-game-icon ch-mini-game-icon--sm' },
           [el('img', { src: g.icon, alt: '', width: 30, height: 30 })]),
         el('div', { class: 'ch-item__label' }, [
           el('div', { text: gname(g) }),
@@ -514,18 +511,18 @@
         el('span', { class: 'ch-badge', text: bestLine(g) || '—' })
       ]));
     });
-    page.appendChild(el('div', { class: 'ch-section' }, [sectionHead(C.t('perGame')), per]));
+    page.appendChild(el('div', { class: 'ch-section ch-layer-panel ch-profile-panel' }, [sectionHead(C.t('perGame')), per]));
 
     // فروشگاه تزئینی
-    page.appendChild(el('div', { class: 'ch-section' }, [sectionHead(C.t('unlocks')), unlockShop()]));
+    page.appendChild(el('div', { class: 'ch-section ch-layer-panel ch-profile-panel' }, [sectionHead(C.t('unlocks')), unlockShop()]));
 
     // تنظیمات
-    page.appendChild(el('div', { class: 'ch-section' }, [sectionHead(C.t('settings')), settingsCard()]));
+    page.appendChild(el('div', { class: 'ch-section ch-layer-panel ch-profile-panel' }, [sectionHead(C.t('settings')), settingsCard()]));
 
     // پاک کردن داده
-    var danger = el('div', { class: 'ch-card' });
+    var danger = el('div', { class: 'ch-card ch-list-card ch-danger-card' });
     GAMES.forEach(function (g) {
-      danger.appendChild(el('div', { class: 'ch-item' }, [
+      danger.appendChild(el('div', { class: 'ch-item ch-soft-row' }, [
         el('div', { class: 'ch-item__label', text: gname(g) }),
         el('button', {
           class: 'ch-btn ch-btn--danger ch-btn--sm', type: 'button', text: C.t('resetGame'),
@@ -545,7 +542,7 @@
         })
       ]));
     });
-    danger.appendChild(el('div', { class: 'ch-item' }, [
+    danger.appendChild(el('div', { class: 'ch-item ch-soft-row ch-soft-row--danger' }, [
       el('div', { class: 'ch-item__label', text: C.t('wipeAll') }),
       el('button', {
         class: 'ch-btn ch-btn--danger ch-btn--sm', type: 'button', text: C.t('wipeAll'),
@@ -562,40 +559,42 @@
         }
       })
     ]));
-    page.appendChild(el('div', { class: 'ch-section' }, [sectionHead(C.t('dangerZone')), danger]));
+    page.appendChild(el('div', { class: 'ch-section ch-layer-panel ch-profile-panel ch-danger-panel' }, [sectionHead(C.t('dangerZone')), danger]));
 
     // درباره
-    page.appendChild(el('div', { class: 'ch-card ch-card--tint' }, [
+    page.appendChild(el('div', { class: 'ch-section ch-layer-panel ch-profile-panel ch-about-panel' }, [
+      el('div', { class: 'ch-card ch-profile-about' }, [
       el('div', { class: 'ch-row', style: { 'margin-bottom': 'var(--s-2)' } }, [
         C.icon('info', 20), el('b', { text: C.t('about') })
       ]),
       el('p', { class: 'ch-sm ch-dim', text: C.t('aboutText') }),
-      el('div', { class: 'ch-item' }, [
+      el('div', { class: 'ch-item ch-soft-row' }, [
         el('div', { class: 'ch-item__label', text: C.t('version') }),
         el('span', { class: 'ch-badge', text: C.num(C.version) })
       ]),
-      el('div', { class: 'ch-item' }, [
+      el('div', { class: 'ch-item ch-soft-row' }, [
         C.icon('shield', 20),
         el('div', { class: 'ch-item__label', text: C.t('secureLocal') }),
         el('span', { class: 'ch-badge ch-badge--good', text: storageModeLabel() })
       ]),
-      el('div', { class: 'ch-item' }, [
+      el('div', { class: 'ch-item ch-soft-row' }, [
         el('div', { class: 'ch-item__label', text: C.t('privacy') }),
         el('a', { href: 'privacy.html', text: C.t('privacyNone') })
       ]),
-      el('div', { class: 'ch-item' }, [
+      el('div', { class: 'ch-item ch-soft-row' }, [
         el('div', { class: 'ch-item__label', text: C.t('showWelcome') }),
         el('button', {
           class: 'ch-btn ch-btn--soft ch-btn--sm', type: 'button', text: C.t('play'),
           onclick: function () { C.feedback('tap'); openWelcome(); }
         })
       ])
+      ])
     ]));
     return page;
   }
 
   function unlockShop() {
-    var card = el('div', { class: 'ch-card' });
+    var card = el('div', { class: 'ch-card ch-list-card ch-unlock-card' });
     var row = el('div', { class: 'ch-row ch-wrap', style: { 'margin-bottom': 'var(--s-4)' } });
     Object.keys(MASCOTS).forEach(function (k) {
       var m = MASCOTS[k];
@@ -674,10 +673,10 @@
   }
 
   function settingsCard() {
-    var card = el('div', { class: 'ch-card' });
+    var card = el('div', { class: 'ch-card ch-list-card ch-settings-card' });
     var s = C.state.settings;
 
-    card.appendChild(el('div', { class: 'ch-item' }, [
+    card.appendChild(el('div', { class: 'ch-item ch-soft-row' }, [
       C.icon('globe', 20),
       el('div', { class: 'ch-item__label', text: C.t('language') }),
       C.ui.segmented(C.locales().map(function (L) { return { value: L.code, label: L.label }; }), s.lang, function (v) {
@@ -685,7 +684,7 @@
       })
     ]));
 
-    card.appendChild(el('div', { class: 'ch-item' }, [
+    card.appendChild(el('div', { class: 'ch-item ch-soft-row' }, [
       C.icon(s.theme === 'dark' ? 'moon' : 'sun', 20),
       el('div', { class: 'ch-item__label', text: C.t('theme') }),
       C.ui.segmented([
@@ -700,7 +699,7 @@
       { icon: 'music', label: C.t('music'), get: function () { return s.music; }, set: function (v) { C.audio.setMusic(v); } },
       { icon: 'vibrate', label: C.t('haptics'), get: function () { return s.haptics; }, set: function (v) { s.haptics = v; C.store.set('settings', s); C.haptic('tap'); } }
     ].forEach(function (o) {
-      card.appendChild(el('div', { class: 'ch-item' }, [
+      card.appendChild(el('div', { class: 'ch-item ch-soft-row' }, [
         C.icon(o.icon, 20),
         el('div', { class: 'ch-item__label', text: o.label }),
         C.ui.switch(o.get(), o.set)

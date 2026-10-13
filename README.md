@@ -12,6 +12,7 @@ Mini Arcade is a local-first Telegram Mini App containing 18 compact games. This
 - Backend-free Telegram friend multiplayer for Chess, Reversi, Mancala, Dots & Boxes, Nine Men's Morris and Backgammon. Completed turns are carried by Telegram deep links; no game server, WebSocket service or database is required.
 - Encrypted browser fallback for development/older clients: a non-extractable CryptoKey is kept in IndexedDB and ciphertext is kept in localStorage.
 - Home, Daily and Profile navigation only. The former league and achievement/award systems are removed from the UI, state model and game result paths.
+- Layered Telegram-native visual system across the non-game surfaces: Daily calendar/detail sheets, Profile/Settings, first-run onboarding and Privacy all use the same section/card hierarchy as the home game library.
 - Privacy page designed to run inside Telegram with the same theme, safe-area and BackButton integration.
 
 ## Project layout
